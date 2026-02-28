@@ -6,16 +6,16 @@ import { registerInputSchema } from "@/src/server/validators/auth";
 const authService = new AuthService();
 
 export async function POST(request: Request) {
-  try {
-    const parsedInput = registerInputSchema.parse(await request.json());
-    const result = await authService.register(parsedInput);
+    try {
+        const parsedInput = registerInputSchema.parse(await request.json());
+        const result = await authService.register(parsedInput);
 
-    if (isLeft(result)) {
-      return toErrorResponse(result.value);
+        if (isLeft(result)) {
+            return toErrorResponse(result.value);
+        }
+
+        return Response.json(result.value, { status: 201 });
+    } catch (error) {
+        return toErrorResponse(error);
     }
-
-    return Response.json(result.value, { status: 201 });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
 }

@@ -1,3 +1,5 @@
+import { getPrismaClient } from "@/src/server/db/prisma";
+
 export type CategoryRecord = {
   id: string;
   name: string;
@@ -56,5 +58,56 @@ export const inMemoryCategoryRepository: CategoryRepository = {
   },
   async delete(id) {
     return categories.delete(id);
+  },
+};
+
+export const prismaCategoryRepository: CategoryRepository = {
+  async list() {
+    return getPrismaClient().category.findMany({
+      orderBy: { name: "asc" },
+    });
+  },
+  async findById(id) {
+    return getPrismaClient().category.findUnique({
+      where: { id },
+    });
+  },
+  async findByName(name) {
+    return getPrismaClient().category.findFirst({
+      where: {
+        name: {
+          equals: name.trim(),
+          mode: "insensitive",
+        },
+      },
+    });
+  },
+  async create(data) {
+    return getPrismaClient().category.create({
+      data: {
+        name: data.name,
+        isActive: data.isActive,
+      },
+    });
+  },
+  async update(id, data) {
+    const existing = await getPrismaClient().category.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!existing) return null;
+
+    return getPrismaClient().category.update({
+      where: { id },
+      data,
+    });
+  },
+  async delete(id) {
+    const result = await getPrismaClient().category.deleteMany({
+      where: { id },
+    });
+
+    return result.count > 0;
   },
 };

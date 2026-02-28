@@ -1,3 +1,5 @@
+import { getPrismaClient } from "@/src/server/db/prisma";
+
 export type StoreConfigRecord = {
   id: string;
   whatsappNumber: string;
@@ -35,5 +37,48 @@ export const inMemoryStoreConfigRepository: StoreConfigRepository = {
     };
 
     return config;
+  },
+};
+
+const getDefaultStoreConfigInput = (): Omit<StoreConfigRecord, "id" | "updatedAt"> => ({
+  whatsappNumber: process.env.STORE_DEFAULT_WHATSAPP ?? "",
+  email: process.env.STORE_DEFAULT_EMAIL ?? "",
+  address: process.env.STORE_DEFAULT_ADDRESS ?? "",
+  companyName: process.env.STORE_DEFAULT_COMPANY_NAME ?? "",
+  cnpj: process.env.STORE_DEFAULT_CNPJ ?? "",
+});
+
+export const prismaStoreConfigRepository: StoreConfigRepository = {
+  async get() {
+    const prisma = getPrismaClient();
+    const existing = await prisma.storeConfig.findFirst({
+      orderBy: { updatedAt: "desc" },
+    });
+
+    if (existing) {
+      return existing;
+    }
+
+    return prisma.storeConfig.create({
+      data: getDefaultStoreConfigInput(),
+    });
+  },
+  async update(data) {
+    const prisma = getPrismaClient();
+    const existing = await prisma.storeConfig.findFirst({
+      orderBy: { updatedAt: "desc" },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return prisma.storeConfig.create({
+        data,
+      });
+    }
+
+    return prisma.storeConfig.update({
+      where: { id: existing.id },
+      data,
+    });
   },
 };

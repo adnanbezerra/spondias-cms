@@ -1,3 +1,4 @@
+import { getPrismaClient } from "@/src/server/db/prisma";
 import { CategoryService } from "@/src/server/services/category-service";
 import { StoreConfigService } from "@/src/server/services/store-config-service";
 
@@ -150,29 +151,102 @@ export const getPublicCategories = async (): Promise<PublicCategory[]> => {
   }
 };
 
-export const getHomeSections = async (): Promise<PublicSection[]> => fallbackSections;
-
 export const getCategoryProducts = async (
   categoryId: string,
 ): Promise<PublicProduct[]> => {
-  const sections = await getHomeSections();
-  const products = sections.flatMap((section) => section.products);
-  if (products.length === 0) return [];
+  try {
+    const sections = await getPrismaClient().section.findMany({
+      where: {
+        isActive: true,
+        categories: {
+          some: {
+            categoryId,
+          },
+        },
+      },
+      include: {
+        products: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: [{ order: "asc" }, { name: "asc" }],
+    });
 
-  const categories = await getPublicCategories();
-  if (categories.length === 0) return products;
+    const productsMap = new Map<string, PublicProduct>();
 
-  const orderedProducts = [...products].sort((a, b) => a.name.localeCompare(b.name));
-  const groupedByCategory = new Map<string, PublicProduct[]>();
+    sections.forEach((section) => {
+      section.products.forEach(({ product }) => {
+        if (!product.isActive) return;
 
-  for (const category of categories) {
-    groupedByCategory.set(category.id, []);
+        productsMap.set(product.id, {
+          id: product.id,
+          name: product.name,
+          priceInCents: product.price,
+          discountPercentage: product.discountPercentage,
+          stock: product.stock,
+          image: product.image ?? "/logo.jpg",
+          description: section.name,
+        });
+      });
+    });
+
+    const products = [...productsMap.values()].sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+
+    if (products.length > 0) {
+      return products;
+    }
+  } catch {
+    // Fall back below when DB is not ready.
   }
 
-  orderedProducts.forEach((product, index) => {
-    const category = categories[index % categories.length];
-    groupedByCategory.get(category.id)?.push(product);
-  });
+  const fallback = await getHomeSections();
+  return fallback.flatMap((section) => section.products);
+};
 
-  return groupedByCategory.get(categoryId) ?? [];
+export const getHomeSections = async (): Promise<PublicSection[]> => {
+  try {
+    const sections = await getPrismaClient().section.findMany({
+      where: { isActive: true },
+      include: {
+        products: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: [{ order: "asc" }, { name: "asc" }],
+    });
+
+    if (sections.length === 0) {
+      return fallbackSections;
+    }
+
+    return sections.map((section) => ({
+      id: section.id,
+      name: section.name,
+      description: section.isBanner
+        ? "Banner promocional configurado no painel administrativo."
+        : "Produtos selecionados para esta seção.",
+      isBanner: section.isBanner,
+      bannerImage: section.bannerImg,
+      products: section.products
+        .map((productSection) => productSection.product)
+        .filter((product) => product.isActive)
+        .map((product) => ({
+          id: product.id,
+          name: product.name,
+          priceInCents: product.price,
+          discountPercentage: product.discountPercentage,
+          stock: product.stock,
+          image: product.image ?? "/logo.jpg",
+          description: section.name,
+        })),
+    }));
+  } catch {
+    return fallbackSections;
+  }
 };
