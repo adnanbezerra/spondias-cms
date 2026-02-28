@@ -1,4 +1,4 @@
-import { inMemoryUserRepository, type UserRepository } from "@/src/server/repositories/user-repository";
+import { prismaUserRepository, type UserRepository } from "@/src/server/repositories/user-repository";
 import { comparePassword, hashPassword } from "@/src/server/security/password";
 import { signJwt } from "@/src/server/security/jwt";
 import { ConflictError, UnauthorizedError, ValidationError } from "@/src/server/shared/errors";
@@ -8,7 +8,7 @@ import { authResponseSchema, type AuthResponse, type LoginInput, type RegisterIn
 export type AuthError = ValidationError | ConflictError | UnauthorizedError;
 
 export class AuthService {
-  constructor(private readonly userRepository: UserRepository = inMemoryUserRepository) {}
+  constructor(private readonly userRepository: UserRepository = prismaUserRepository) {}
 
   async register(input: RegisterInput): Promise<Either<AuthError, AuthResponse>> {
     const emailAlreadyUsed = await this.userRepository.findByEmail(input.email);

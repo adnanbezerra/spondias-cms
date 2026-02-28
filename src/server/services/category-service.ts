@@ -1,4 +1,4 @@
-import { inMemoryCategoryRepository, type CategoryRecord, type CategoryRepository } from "@/src/server/repositories/category-repository";
+import { prismaCategoryRepository, type CategoryRecord, type CategoryRepository } from "@/src/server/repositories/category-repository";
 import { ConflictError, NotFoundError } from "@/src/server/shared/errors";
 import { left, right, type Either } from "@/src/server/shared/either";
 import { categoryOutputSchema, type CategoryCreateInput, type CategoryUpdateInput } from "@/src/server/validators/category";
@@ -6,7 +6,7 @@ import { categoryOutputSchema, type CategoryCreateInput, type CategoryUpdateInpu
 export type CategoryError = ConflictError | NotFoundError;
 
 export class CategoryService {
-  constructor(private readonly repository: CategoryRepository = inMemoryCategoryRepository) {}
+  constructor(private readonly repository: CategoryRepository = prismaCategoryRepository) {}
 
   async list(): Promise<Either<never, CategoryRecord[]>> {
     const categories = await this.repository.list();

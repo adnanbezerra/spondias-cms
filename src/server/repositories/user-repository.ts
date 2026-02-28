@@ -1,3 +1,5 @@
+import { getPrismaClient } from "@/src/server/db/prisma";
+
 export type UserRecord = {
   id: string;
   email: string;
@@ -44,6 +46,43 @@ export const inMemoryUserRepository: UserRepository = {
     };
 
     users.set(user.id, user);
+    return user;
+  },
+};
+
+export const prismaUserRepository: UserRepository = {
+  async findByEmail(email) {
+    const user = await getPrismaClient().user.findUnique({
+      where: { email },
+    });
+
+    return user;
+  },
+  async findByCpf(cpf) {
+    const user = await getPrismaClient().user.findUnique({
+      where: { cpf },
+    });
+
+    return user;
+  },
+  async findByEmailOrCpf(login) {
+    const user = await getPrismaClient().user.findFirst({
+      where: {
+        OR: [{ email: login }, { cpf: login }],
+      },
+    });
+
+    return user;
+  },
+  async create(data) {
+    const user = await getPrismaClient().user.create({
+      data: {
+        email: data.email,
+        cpf: data.cpf,
+        passwordHash: data.passwordHash,
+      },
+    });
+
     return user;
   },
 };

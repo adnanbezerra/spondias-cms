@@ -5,6 +5,8 @@
   --brand-secondary: #334d40;
   --background: #dbd7cb;
   --foreground: #334d40;
+  --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-title: "Iowan Old Style", "Baskerville", "Times New Roman", serif;
 }
 
 @theme inline {
@@ -19,5 +21,5 @@ body {
     radial-gradient(circle at bottom right, rgba(51, 77, 64, 0.15), transparent 52%),
     var(--background);
   color: var(--foreground);
-  font-family: var(--font-body), sans-serif;
+  font-family: var(--font-body);
 }
