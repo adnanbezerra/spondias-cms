@@ -1,0 +1,49 @@
+export type UserRecord = {
+  id: string;
+  email: string;
+  cpf: string;
+  passwordHash: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type UserRepository = {
+  findByEmail(email: string): Promise<UserRecord | null>;
+  findByCpf(cpf: string): Promise<UserRecord | null>;
+  findByEmailOrCpf(login: string): Promise<UserRecord | null>;
+  create(data: Pick<UserRecord, "email" | "cpf" | "passwordHash">): Promise<UserRecord>;
+};
+
+const users = new Map<string, UserRecord>();
+
+export const inMemoryUserRepository: UserRepository = {
+  async findByEmail(email) {
+    return [...users.values()].find((user) => user.email === email) ?? null;
+  },
+  async findByCpf(cpf) {
+    return [...users.values()].find((user) => user.cpf === cpf) ?? null;
+  },
+  async findByEmailOrCpf(login) {
+    return (
+      [...users.values()].find(
+        (user) => user.email === login || user.cpf === login,
+      ) ?? null
+    );
+  },
+  async create(data) {
+    const now = new Date();
+    const user: UserRecord = {
+      id: crypto.randomUUID(),
+      email: data.email,
+      cpf: data.cpf,
+      passwordHash: data.passwordHash,
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    users.set(user.id, user);
+    return user;
+  },
+};
