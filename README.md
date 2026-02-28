@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Spondias CMS
 
-## Getting Started
+Base do monólito em Next.js para loja de plantas, com área pública SSR e APIs administrativas.
 
-First, run the development server:
+## O que já foi implementado
+
+- Estrutura de domínio server-side em `src/server/*`.
+- Padrão `Either` (`left`/`right`) para casos de uso.
+- Endpoints de autenticação:
+  - `POST /api/auth/register`
+  - `POST /api/auth/login`
+- Middleware/proxy protegendo `/admin/*` e `/api/admin/*` via token JWT.
+- CRUD inicial de categorias no admin:
+  - `GET /api/admin/categories`
+  - `POST /api/admin/categories`
+  - `PATCH /api/admin/categories/:id`
+  - `DELETE /api/admin/categories/:id`
+- Configuração institucional no admin:
+  - `GET /api/admin/store-config`
+  - `PUT /api/admin/store-config`
+- Validação de entrada e saída com `zod`.
+- Modelagem inicial Prisma em `prisma/schema.prisma`.
+- Variáveis obrigatórias documentadas em `.env.example`.
+
+## Rodando localmente
 
 ```bash
+npm install
+cp .env.example .env
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Observações
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Se o ambiente bloquear acesso ao npm registry, a instalação de pacotes como `prisma` e `@prisma/client` pode falhar.
