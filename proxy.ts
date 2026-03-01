@@ -12,23 +12,40 @@ const getBearerToken = (request: NextRequest): string | null => {
 };
 
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (pathname === "/admin/login") {
+    return NextResponse.next();
+  }
+
   const token = getBearerToken(request);
+  const isAdminApiPath = pathname.startsWith("/api/admin/");
 
   if (!token) {
-    return NextResponse.json(
-      { code: "UNAUTHORIZED", message: "Token ausente." },
-      { status: 401 },
-    );
+    if (isAdminApiPath) {
+      return NextResponse.json(
+        { code: "UNAUTHORIZED", message: "Token ausente." },
+        { status: 401 },
+      );
+    }
+
+    const loginUrl = new URL("/admin/login", request.url);
+    return NextResponse.redirect(loginUrl);
   }
 
   try {
     await verifyJwtEdge(token);
     return NextResponse.next();
   } catch {
-    return NextResponse.json(
-      { code: "UNAUTHORIZED", message: "Token inválido." },
-      { status: 401 },
-    );
+    if (isAdminApiPath) {
+      return NextResponse.json(
+        { code: "UNAUTHORIZED", message: "Token inválido." },
+        { status: 401 },
+      );
+    }
+
+    const loginUrl = new URL("/admin/login", request.url);
+    return NextResponse.redirect(loginUrl);
   }
 }
 
