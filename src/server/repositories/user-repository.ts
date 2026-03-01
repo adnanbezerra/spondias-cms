@@ -2,6 +2,7 @@ import { getPrismaClient } from "@/src/server/db/prisma";
 
 export type UserRecord = {
     id: string;
+    name: string;
     email: string;
     cpf: string;
     passwordHash: string;
@@ -15,7 +16,7 @@ export type UserRepository = {
     findByCpf(cpf: string): Promise<UserRecord | null>;
     findByEmailOrCpf(login: string): Promise<UserRecord | null>;
     create(
-        data: Pick<UserRecord, "email" | "cpf" | "passwordHash">,
+        data: Pick<UserRecord, "name" | "email" | "cpf" | "passwordHash">,
     ): Promise<UserRecord>;
 };
 
@@ -39,6 +40,7 @@ export const inMemoryUserRepository: UserRepository = {
         const now = new Date();
         const user: UserRecord = {
             id: crypto.randomUUID(),
+            name: data.name,
             email: data.email,
             cpf: data.cpf,
             passwordHash: data.passwordHash,
@@ -79,6 +81,7 @@ export const prismaUserRepository: UserRepository = {
     async create(data) {
         const user = await getPrismaClient().user.create({
             data: {
+                name: data.name,
                 email: data.email,
                 cpf: data.cpf,
                 passwordHash: data.passwordHash,
