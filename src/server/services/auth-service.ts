@@ -40,6 +40,7 @@ export class AuthService {
         }
 
         const createdUser = await this.userRepository.create({
+            name: input.name,
             email: input.email,
             cpf: input.cpf,
             passwordHash: hashPassword(input.password),
@@ -55,6 +56,7 @@ export class AuthService {
             token,
             user: {
                 id: createdUser.id,
+                name: createdUser.name,
                 email: createdUser.email,
                 cpf: createdUser.cpf,
             },
@@ -84,6 +86,7 @@ export class AuthService {
             token,
             user: {
                 id: user.id,
+                name: user.name,
                 email: user.email,
                 cpf: user.cpf,
             },

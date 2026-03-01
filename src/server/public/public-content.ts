@@ -58,80 +58,13 @@ export type PublicCategoryDetails = {
     products: PublicProduct[];
 };
 
-const defaultConfig: PublicStoreConfig = {
-    whatsappNumber: "5548999999999",
-    email: "contato@spondias.com.br",
-    address: "Endereço não configurado",
-    companyName: "Spondias",
-    cnpj: "00.000.000/0000-00",
+const emptyStoreConfig: PublicStoreConfig = {
+    whatsappNumber: "",
+    email: "",
+    address: "",
+    companyName: "",
+    cnpj: "",
 };
-
-const fallbackSections: PublicSection[] = [
-    {
-        id: "11111111-1111-4111-8111-111111111111",
-        name: "Plantas de Sol Pleno",
-        description:
-            "Espécies resistentes para áreas externas com alta incidência solar.",
-        isBanner: false,
-        bannerImage: null,
-        products: [
-            {
-                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
-                name: "Jiboia Limão",
-                description: "Folhagem ornamental de fácil cuidado.",
-                priceInCents: 4590,
-                discountPercentage: 10,
-                stock: 12,
-                image: "/logo.jpg",
-            },
-            {
-                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
-                name: "Zamioculca",
-                description: "Ideal para iniciantes e ambientes internos.",
-                priceInCents: 6990,
-                discountPercentage: 0,
-                stock: 7,
-                image: "/logo.jpg",
-            },
-        ],
-    },
-    {
-        id: "22222222-2222-4222-8222-222222222222",
-        name: "Oferta da Semana",
-        description: "Aproveite descontos especiais em plantas selecionadas.",
-        isBanner: true,
-        bannerImage: "/logo.jpg",
-        products: [],
-    },
-    {
-        id: "33333333-3333-4333-8333-333333333333",
-        name: "Plantas para Vasos Suspensos",
-        description: "Seção para espécies pendentes e decoração vertical.",
-        isBanner: false,
-        bannerImage: null,
-        products: [
-            {
-                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3",
-                name: "Hera Inglesa",
-                description:
-                    "Crescimento vigoroso para jardineiras e suportes.",
-                priceInCents: 3290,
-                discountPercentage: 5,
-                stock: 21,
-                image: "/logo.jpg",
-            },
-            {
-                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4",
-                name: "Colar de Pérolas",
-                description: "Visual delicado para ambientes bem iluminados.",
-                priceInCents: 5490,
-                discountPercentage: 15,
-                stock: 9,
-                image: "/logo.jpg",
-            },
-        ],
-    },
-];
 
 const normalizeWhatsAppNumber = (value: string): string =>
     value.replace(/\D/g, "");
@@ -152,15 +85,14 @@ export const getPublicStoreConfig = async (): Promise<PublicStoreConfig> => {
     try {
         const result = await storeConfigService.get();
         return {
-            whatsappNumber:
-                result.value.whatsappNumber || defaultConfig.whatsappNumber,
-            email: result.value.email || defaultConfig.email,
-            address: result.value.address || defaultConfig.address,
-            companyName: result.value.companyName || defaultConfig.companyName,
-            cnpj: result.value.cnpj || defaultConfig.cnpj,
+            whatsappNumber: result.value.whatsappNumber,
+            email: result.value.email,
+            address: result.value.address,
+            companyName: result.value.companyName,
+            cnpj: result.value.cnpj,
         };
     } catch {
-        return defaultConfig;
+        return emptyStoreConfig;
     }
 };
 
@@ -255,11 +187,10 @@ export const getCategoryProducts = async (
             return products;
         }
     } catch {
-        // Fall back below when DB is not ready.
+        // Ignore and return empty list below.
     }
 
-    const fallback = await getHomeSections();
-    return fallback.flatMap((section) => section.products);
+    return [];
 };
 
 export const getHomeSections = async (): Promise<PublicSection[]> => {
@@ -271,13 +202,9 @@ export const getHomeSections = async (): Promise<PublicSection[]> => {
                 orderBy: [{ order: "asc" }, { name: "asc" }],
             });
 
-        if (sections.length === 0) {
-            return fallbackSections;
-        }
-
         return sections.map((section) => mapSectionToPublicSection(section));
     } catch {
-        return fallbackSections;
+        return [];
     }
 };
 
