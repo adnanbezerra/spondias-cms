@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { PublicStoreConfig } from "@/src/server/public/public-content";
 
 type SiteFooterProps = {
@@ -30,6 +31,12 @@ export const SiteFooter = ({ config }: SiteFooterProps) => {
                         <span className="font-semibold">CNPJ:</span>{" "}
                         {config.cnpj}
                     </p>
+                    <Link
+                        href="/admin"
+                        className="inline-block rounded-full border border-[#DBD7CB]/35 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition hover:bg-[#DBD7CB] hover:text-[#334D40]"
+                    >
+                        Área administrativa
+                    </Link>
                 </div>
             </div>
         </footer>
