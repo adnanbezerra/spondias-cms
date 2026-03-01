@@ -2,6 +2,7 @@ import { randomBytes, scryptSync } from "node:crypto";
 import prismaClientPkg from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pgPkg from "pg";
+import "dotenv/config";
 
 const { PrismaClient } = prismaClientPkg;
 const { Pool } = pgPkg;
@@ -26,11 +27,20 @@ const hashPassword = (plainPassword) => {
     return `${salt}:${hash}`;
 };
 
+const getRequiredEnv = (key) => {
+    const value = process.env[key]?.trim();
+    if (!value) {
+        throw new Error(`Variavel obrigatoria ausente: ${key}`);
+    }
+
+    return value;
+};
+
 const adminUser = {
-    name: "Adnan",
-    email: "adnanbezerra@proton.me",
-    cpf: "00000000000",
-    password: "ykZhPYY&0H%DTTNB0GRtmzrFE&zP8x",
+    name: getRequiredEnv("SEED_ADMIN_NAME"),
+    email: getRequiredEnv("SEED_ADMIN_EMAIL"),
+    cpf: getRequiredEnv("SEED_ADMIN_CPF"),
+    password: getRequiredEnv("SEED_ADMIN_PASSWORD"),
 };
 
 const storeConfig = {
@@ -131,27 +141,17 @@ const seedCategories = [
 ];
 
 const seed = async () => {
-    const existingAdmin = await prisma.user.findFirst({
-        where: {
-            OR: [{ email: adminUser.email }, { cpf: adminUser.cpf }],
-        },
+    const existingAdminByEmail = await prisma.user.findUnique({
+        where: { email: adminUser.email },
+        select: { id: true },
+    });
+    const existingAdminByCpf = await prisma.user.findUnique({
+        where: { cpf: adminUser.cpf },
         select: { id: true },
     });
 
-    const passwordHash = hashPassword(adminUser.password);
-
-    if (existingAdmin) {
-        await prisma.user.update({
-            where: { id: existingAdmin.id },
-            data: {
-                name: adminUser.name,
-                email: adminUser.email,
-                cpf: adminUser.cpf,
-                passwordHash,
-                isActive: true,
-            },
-        });
-    } else {
+    if (!existingAdminByEmail && !existingAdminByCpf) {
+        const passwordHash = hashPassword(adminUser.password);
         await prisma.user.create({
             data: {
                 name: adminUser.name,
@@ -163,128 +163,105 @@ const seed = async () => {
         });
     }
 
-    const existingStoreConfig = await prisma.storeConfig.findFirst({
-        orderBy: { updatedAt: "desc" },
-        select: { id: true },
-    });
-
-    if (existingStoreConfig) {
-        await prisma.storeConfig.update({
-            where: { id: existingStoreConfig.id },
-            data: storeConfig,
-        });
-    } else {
+    const storeConfigCount = await prisma.storeConfig.count();
+    if (storeConfigCount === 0) {
         await prisma.storeConfig.create({
             data: storeConfig,
         });
     }
 
-    const links = [];
-
-    for (const section of seedSections) {
-        await prisma.section.upsert({
-            where: { id: section.id },
-            update: {
-                name: section.name,
-                isActive: section.isActive,
-                order: section.order,
-                isBanner: section.isBanner,
-                bannerImg: section.bannerImg,
-            },
-            create: {
-                id: section.id,
-                name: section.name,
-                isActive: section.isActive,
-                order: section.order,
-                isBanner: section.isBanner,
-                bannerImg: section.bannerImg,
-            },
-        });
-
-        for (const product of section.products) {
-            await prisma.product.upsert({
-                where: { id: product.id },
-                update: {
-                    name: product.name,
-                    price: product.price,
-                    discountPercentage: product.discountPercentage,
-                    stock: product.stock,
-                    image: product.image,
-                    isActive: product.isActive,
-                },
-                create: {
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    discountPercentage: product.discountPercentage,
-                    stock: product.stock,
-                    image: product.image,
-                    isActive: product.isActive,
-                },
-            });
-
-            links.push({
-                sectionId: section.id,
-                productId: product.id,
-            });
-        }
-    }
-
-    await prisma.productSection.deleteMany({
-        where: {
-            OR: [
-                { sectionId: { in: seedSections.map((section) => section.id) } },
-                {
-                    productId: {
-                        in: seedSections.flatMap((section) =>
-                            section.products.map((product) => product.id),
-                        ),
-                    },
-                },
-            ],
-        },
+    const sectionIds = seedSections.map((section) => section.id);
+    const existingSections = await prisma.section.findMany({
+        where: { id: { in: sectionIds } },
+        select: { id: true },
     });
+    const existingSectionIds = new Set(existingSections.map((item) => item.id));
+    const sectionsToCreate = seedSections
+        .filter((section) => !existingSectionIds.has(section.id))
+        .map((section) => ({
+            id: section.id,
+            name: section.name,
+            isActive: section.isActive,
+            order: section.order,
+            isBanner: section.isBanner,
+            bannerImg: section.bannerImg,
+        }));
 
-    if (links.length > 0) {
-        await prisma.productSection.createMany({
-            data: links,
+    if (sectionsToCreate.length > 0) {
+        await prisma.section.createMany({
+            data: sectionsToCreate,
             skipDuplicates: true,
         });
     }
 
-    const sectionCategoryLinks = [];
+    const seedProducts = seedSections.flatMap((section) => section.products);
+    const productIds = seedProducts.map((product) => product.id);
+    const existingProducts = await prisma.product.findMany({
+        where: { id: { in: productIds } },
+        select: { id: true },
+    });
+    const existingProductIds = new Set(existingProducts.map((item) => item.id));
+    const productsToCreate = seedProducts
+        .filter((product) => !existingProductIds.has(product.id))
+        .map((product) => ({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            discountPercentage: product.discountPercentage,
+            stock: product.stock,
+            image: product.image,
+            isActive: product.isActive,
+        }));
 
-    for (const category of seedCategories) {
-        await prisma.category.upsert({
-            where: { id: category.id },
-            update: {
-                name: category.name,
-                isActive: category.isActive,
-            },
-            create: {
-                id: category.id,
-                name: category.name,
-                isActive: category.isActive,
-            },
+    if (productsToCreate.length > 0) {
+        await prisma.product.createMany({
+            data: productsToCreate,
+            skipDuplicates: true,
         });
-
-        for (const sectionId of category.sectionIds) {
-            sectionCategoryLinks.push({
-                sectionId,
-                categoryId: category.id,
-            });
-        }
     }
 
-    await prisma.sectionCategory.deleteMany({
-        where: {
-            OR: [
-                { sectionId: { in: seedSections.map((section) => section.id) } },
-                { categoryId: { in: seedCategories.map((category) => category.id) } },
-            ],
-        },
-    });
+    const productSectionLinks = seedSections.flatMap((section) =>
+        section.products.map((product) => ({
+            sectionId: section.id,
+            productId: product.id,
+        })),
+    );
+    if (productSectionLinks.length > 0) {
+        await prisma.productSection.createMany({
+            data: productSectionLinks,
+            skipDuplicates: true,
+        });
+    }
 
+    const categoryIds = seedCategories.map((category) => category.id);
+    const existingCategories = await prisma.category.findMany({
+        where: { id: { in: categoryIds } },
+        select: { id: true },
+    });
+    const existingCategoryIds = new Set(
+        existingCategories.map((item) => item.id),
+    );
+    const categoriesToCreate = seedCategories
+        .filter((category) => !existingCategoryIds.has(category.id))
+        .map((category) => ({
+            id: category.id,
+            name: category.name,
+            isActive: category.isActive,
+        }));
+
+    if (categoriesToCreate.length > 0) {
+        await prisma.category.createMany({
+            data: categoriesToCreate,
+            skipDuplicates: true,
+        });
+    }
+
+    const sectionCategoryLinks = seedCategories.flatMap((category) =>
+        category.sectionIds.map((sectionId) => ({
+            sectionId,
+            categoryId: category.id,
+        })),
+    );
     if (sectionCategoryLinks.length > 0) {
         await prisma.sectionCategory.createMany({
             data: sectionCategoryLinks,
