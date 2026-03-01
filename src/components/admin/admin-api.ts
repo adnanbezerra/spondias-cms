@@ -25,6 +25,16 @@ export type AdminProduct = {
   isActive: boolean;
 };
 
+export type AdminStoreConfig = {
+  id: string;
+  whatsappNumber: string;
+  email: string;
+  address: string;
+  companyName: string;
+  cnpj: string;
+  updatedAt: string;
+};
+
 type UploadImageResponse = {
   url: string;
   fileName: string;
