@@ -32,3 +32,9 @@ export class NotFoundError extends AppError {
     super(message, 404, "NOT_FOUND");
   }
 }
+
+export class TooManyRequestsError extends AppError {
+  constructor(message = "Muitas requisições. Tente novamente em instantes.") {
+    super(message, 429, "TOO_MANY_REQUESTS");
+  }
+}

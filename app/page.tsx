@@ -9,6 +9,8 @@ import {
     getPublicStoreConfig,
 } from "@/src/server/public/public-content";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
     const [config, categories, sections] = await Promise.all([
         getPublicStoreConfig(),
