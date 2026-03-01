@@ -1,5 +1,5 @@
 import { getPrismaClient } from "@/src/server/db/prisma";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { CategoryService } from "@/src/server/services/category-service";
 import { StoreConfigService } from "@/src/server/services/store-config-service";
 
@@ -286,7 +286,7 @@ export const getSectionById = async (
 ): Promise<PublicSection | null> => {
     try {
         const section: SectionWithProducts | null =
-            await getPrismaClient().section.findUnique({
+            await getPrismaClient().section.findFirst({
                 where: {
                     id: sectionId,
                     isActive: true,
@@ -308,8 +308,7 @@ export const getCategoryById = async (
     categoryId: string,
 ): Promise<PublicCategoryDetails | null> => {
     try {
-        const category = await getPrismaClient().category.findUnique({
-            where: { isActive: true },
+        const category = await getPrismaClient().category.findFirst({
             include: {
                 sections: {
                     include: {

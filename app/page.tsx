@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ProductCard } from "@/src/components/public/product-card";
 import { SiteFooter } from "@/src/components/public/site-footer";
 import { SiteHeader } from "@/src/components/public/site-header";
@@ -69,7 +70,12 @@ export default async function Home() {
                     <article key={section.id} className="space-y-4">
                         <header className="space-y-2">
                             <h2 className="text-3xl font-semibold [font-family:var(--font-title)]">
-                                {section.name}
+                                <Link
+                                    href={`/secao/${section.id}`}
+                                    className="hover:underline"
+                                >
+                                    {section.name}
+                                </Link>
                             </h2>
                             <p className="text-sm text-[#334D40]/80">
                                 {section.description}
