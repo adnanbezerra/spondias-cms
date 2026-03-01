@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { AdminNav } from "@/src/components/admin/admin-nav";
+import { useAdminToast } from "@/src/components/admin/admin-toast";
 import { fetchJson, uploadImage, type AdminProduct, type AdminSection } from "@/src/components/admin/admin-api";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [sections, setSections] = useState<AdminSection[]>([]);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [stock, setStock] = useState<number>(0);
@@ -16,6 +19,7 @@ export default function AdminProductsPage() {
   const [selectedSectionIds, setSelectedSectionIds] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { showToast } = useAdminToast();
 
   const loadData = async () => {
     const [productsPayload, sectionsPayload] = await Promise.all([
@@ -28,8 +32,47 @@ export default function AdminProductsPage() {
   };
 
   useEffect(() => {
-    loadData().catch(() => setErrorMessage("Falha ao carregar dados de produtos."));
-  }, []);
+    loadData().catch(() => {
+      setErrorMessage("Falha ao carregar dados de produtos.");
+      showToast("Falha ao carregar dados de produtos.", { variant: "error" });
+    });
+  }, [showToast]);
+
+  const resetForm = () => {
+    setEditingProductId(null);
+    setCurrentImageUrl(null);
+    setName("");
+    setPrice(0);
+    setStock(0);
+    setDiscountPercentage(0);
+    setIsActive(true);
+    setImageFile(null);
+    setSelectedSectionIds([]);
+  };
+
+  const onEditProduct = async (productId: string) => {
+    setErrorMessage(null);
+
+    try {
+      const [product, relation] = await Promise.all([
+        fetchJson<AdminProduct>(`/api/admin/products/${productId}`),
+        fetchJson<{ sectionIds: string[] }>(`/api/admin/products/${productId}/sections`),
+      ]);
+
+      setEditingProductId(product.id);
+      setCurrentImageUrl(product.image);
+      setName(product.name);
+      setPrice(product.price);
+      setStock(product.stock);
+      setDiscountPercentage(product.discountPercentage);
+      setIsActive(product.isActive);
+      setImageFile(null);
+      setSelectedSectionIds(relation.sectionIds);
+    } catch (error) {
+      showToast("Falha ao carregar produto para edição.", { variant: "error" });
+      setErrorMessage(error instanceof Error ? error.message : "Falha ao carregar produto.");
+    }
+  };
 
   const onToggleSection = (sectionId: string) => {
     setSelectedSectionIds((current) =>
@@ -39,59 +82,73 @@ export default function AdminProductsPage() {
     );
   };
 
-  const onCreateProduct = async (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmitProduct = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage(null);
     setIsSubmitting(true);
 
     try {
-      let imageUrl: string | null = null;
+      let imageUrl = currentImageUrl;
       if (imageFile) {
         const upload = await uploadImage(imageFile);
         imageUrl = upload.url;
       }
 
-      const createdProduct = await fetchJson<AdminProduct>("/api/admin/products", {
-        method: "POST",
-        body: JSON.stringify({
-          name,
-          price,
-          stock,
-          discountPercentage,
-          isActive,
-          image: imageUrl,
-        }),
-      });
+      const productPayload = {
+        name,
+        price,
+        stock,
+        discountPercentage,
+        isActive,
+        image: imageUrl,
+      };
 
-      await fetchJson<{ updated: true }>(`/api/admin/products/${createdProduct.id}/sections`, {
+      const product = editingProductId
+        ? await fetchJson<AdminProduct>(`/api/admin/products/${editingProductId}`, {
+            method: "PATCH",
+            body: JSON.stringify(productPayload),
+          })
+        : await fetchJson<AdminProduct>("/api/admin/products", {
+            method: "POST",
+            body: JSON.stringify(productPayload),
+          });
+
+      await fetchJson<{ updated: true }>(`/api/admin/products/${product.id}/sections`, {
         method: "PUT",
         body: JSON.stringify({
           sectionIds: selectedSectionIds,
         }),
       });
 
-      setName("");
-      setPrice(0);
-      setStock(0);
-      setDiscountPercentage(0);
-      setIsActive(true);
-      setImageFile(null);
-      setSelectedSectionIds([]);
+      resetForm();
       await loadData();
+      showToast(
+        editingProductId ? "Produto atualizado com sucesso." : "Produto criado com sucesso.",
+        { variant: "success" },
+      );
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Falha ao criar produto.");
+      showToast("Falha ao salvar produto.", { variant: "error" });
+      setErrorMessage(error instanceof Error ? error.message : "Falha ao salvar produto.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const onDeleteProduct = async (productId: string) => {
+    const approved = window.confirm("Deseja realmente excluir este produto?");
+    if (!approved) return;
+
     try {
       await fetchJson<{ deleted: true }>(`/api/admin/products/${productId}`, {
         method: "DELETE",
       });
+      showToast("Produto excluído com sucesso.", { variant: "success" });
+      if (editingProductId === productId) {
+        resetForm();
+      }
       await loadData();
     } catch (error) {
+      showToast("Falha ao excluir produto.", { variant: "error" });
       setErrorMessage(error instanceof Error ? error.message : "Falha ao excluir produto.");
     }
   };
@@ -101,11 +158,11 @@ export default function AdminProductsPage() {
       <AdminNav />
       <section className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr,1.2fr]">
         <form
-          onSubmit={onCreateProduct}
+          onSubmit={onSubmitProduct}
           className="space-y-4 rounded-2xl border border-[#334D40]/15 bg-white/80 p-5 shadow-sm"
         >
           <h1 className="text-2xl font-semibold [font-family:var(--font-title)]">
-            Novo produto
+            {editingProductId ? "Editar produto" : "Novo produto"}
           </h1>
 
           <div className="space-y-1">
@@ -174,6 +231,11 @@ export default function AdminProductsPage() {
               onChange={(event) => setImageFile(event.target.files?.item(0) ?? null)}
               className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
             />
+            {currentImageUrl ? (
+              <p className="text-xs text-[#334D40]/75 break-all">
+                Imagem atual: {currentImageUrl}
+              </p>
+            ) : null}
           </div>
 
           <div className="space-y-2">
@@ -209,8 +271,21 @@ export default function AdminProductsPage() {
             disabled={isSubmitting}
             className="rounded-xl bg-[#334D40] px-4 py-2 font-semibold text-[#DBD7CB] disabled:opacity-70"
           >
-            {isSubmitting ? "Salvando..." : "Criar produto"}
+            {isSubmitting
+              ? "Salvando..."
+              : editingProductId
+                ? "Salvar alterações"
+                : "Criar produto"}
           </button>
+          {editingProductId ? (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="ml-2 rounded-xl border border-[#334D40]/20 px-4 py-2 text-sm"
+            >
+              Cancelar edição
+            </button>
+          ) : null}
         </form>
 
         <div className="space-y-3 rounded-2xl border border-[#334D40]/15 bg-white/80 p-5 shadow-sm">
@@ -241,6 +316,13 @@ export default function AdminProductsPage() {
                       </p>
                     ) : null}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => onEditProduct(product.id)}
+                    className="rounded-lg border border-[#334D40]/20 px-2 py-1 text-xs"
+                  >
+                    Editar
+                  </button>
                   <button
                     type="button"
                     onClick={() => onDeleteProduct(product.id)}

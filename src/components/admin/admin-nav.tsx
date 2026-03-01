@@ -13,6 +13,12 @@ export const AdminNav = () => {
             Dashboard
           </Link>
           <Link
+            href="/admin/categories"
+            className="rounded-full border border-[#334D40]/20 px-3 py-1.5"
+          >
+            Categorias
+          </Link>
+          <Link
             href="/admin/sections"
             className="rounded-full border border-[#334D40]/20 px-3 py-1.5"
           >
@@ -23,6 +29,12 @@ export const AdminNav = () => {
             className="rounded-full border border-[#334D40]/20 px-3 py-1.5"
           >
             Produtos
+          </Link>
+          <Link
+            href="/admin/settings"
+            className="rounded-full border border-[#334D40]/20 px-3 py-1.5"
+          >
+            Configurações
           </Link>
         </div>
 
