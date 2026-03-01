@@ -13,6 +13,15 @@ export class CategoryService {
     return right(categories.map((item) => categoryOutputSchema.parse(item)));
   }
 
+  async getById(id: string): Promise<Either<NotFoundError, CategoryRecord>> {
+    const category = await this.repository.findById(id);
+    if (!category) {
+      return left(new NotFoundError("Categoria não encontrada."));
+    }
+
+    return right(categoryOutputSchema.parse(category));
+  }
+
   async create(input: CategoryCreateInput): Promise<Either<CategoryError, CategoryRecord>> {
     const found = await this.repository.findByName(input.name);
     if (found) {

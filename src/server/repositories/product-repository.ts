@@ -33,6 +33,7 @@ export type ProductRepository = {
   ): Promise<ProductRecord | null>;
   delete(id: string): Promise<boolean>;
   replaceSections(productId: string, sectionIds: string[]): Promise<void>;
+  listSectionIds(productId: string): Promise<string[]>;
 };
 
 export const prismaProductRepository: ProductRepository = {
@@ -98,5 +99,14 @@ export const prismaProductRepository: ProductRepository = {
           ]
         : []),
     ]);
+  },
+  async listSectionIds(productId) {
+    const rows = await getPrismaClient().productSection.findMany({
+      where: { productId },
+      select: { sectionId: true },
+      orderBy: { sectionId: "asc" },
+    });
+
+    return rows.map((row) => row.sectionId);
   },
 };

@@ -24,6 +24,10 @@ export const sectionReplaceCategoriesInputSchema = z.object({
   categoryIds: z.array(z.uuid()).max(200),
 });
 
+export const sectionCategoriesOutputSchema = z.object({
+  categoryIds: z.array(z.uuid()),
+});
+
 export const sectionOutputSchema = z.object({
   id: z.uuid(),
   name: z.string(),

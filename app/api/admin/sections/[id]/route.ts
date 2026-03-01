@@ -10,6 +10,21 @@ const sectionService = new SectionService();
 
 type Params = { params: Promise<{ id: string }> };
 
+export async function GET(_request: Request, context: Params) {
+    try {
+        const params = sectionIdParamsSchema.parse(await context.params);
+        const result = await sectionService.getById(params.id);
+
+        if (isLeft(result)) {
+            return toErrorResponse(result.value);
+        }
+
+        return Response.json(result.value, { status: 200 });
+    } catch (error) {
+        return toErrorResponse(error);
+    }
+}
+
 export async function PATCH(request: Request, context: Params) {
     try {
         const params = sectionIdParamsSchema.parse(await context.params);

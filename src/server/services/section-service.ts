@@ -10,6 +10,7 @@ import {
 import { ConflictError, NotFoundError, ValidationError } from "@/src/server/shared/errors";
 import { left, right, type Either } from "@/src/server/shared/either";
 import {
+  sectionCategoriesOutputSchema,
   sectionOutputSchema,
   type SectionCreateInput,
   type SectionUpdateInput,
@@ -26,6 +27,15 @@ export class SectionService {
   async list(): Promise<Either<never, SectionRecord[]>> {
     const sections = await this.sectionRepository.list();
     return right(sections.map((item) => sectionOutputSchema.parse(item)));
+  }
+
+  async getById(id: string): Promise<Either<SectionError, SectionRecord>> {
+    const section = await this.sectionRepository.findById(id);
+    if (!section) {
+      return left(new NotFoundError("Seção não encontrada."));
+    }
+
+    return right(sectionOutputSchema.parse(section));
   }
 
   async create(input: SectionCreateInput): Promise<Either<SectionError, SectionRecord>> {
@@ -90,5 +100,17 @@ export class SectionService {
 
     await this.sectionRepository.replaceCategories(id, uniqueCategoryIds);
     return right({ updated: true });
+  }
+
+  async listCategoryIds(
+    id: string,
+  ): Promise<Either<SectionError, { categoryIds: string[] }>> {
+    const section = await this.sectionRepository.findById(id);
+    if (!section) {
+      return left(new NotFoundError("Seção não encontrada."));
+    }
+
+    const categoryIds = await this.sectionRepository.listCategoryIds(id);
+    return right(sectionCategoriesOutputSchema.parse({ categoryIds }));
   }
 }

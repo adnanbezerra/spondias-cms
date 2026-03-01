@@ -10,6 +10,21 @@ const productService = new ProductService();
 
 type Params = { params: Promise<{ id: string }> };
 
+export async function GET(_request: Request, context: Params) {
+    try {
+        const params = productIdParamsSchema.parse(await context.params);
+        const result = await productService.listSectionIds(params.id);
+
+        if (isLeft(result)) {
+            return toErrorResponse(result.value);
+        }
+
+        return Response.json(result.value, { status: 200 });
+    } catch (error) {
+        return toErrorResponse(error);
+    }
+}
+
 export async function PUT(request: Request, context: Params) {
     try {
         const params = productIdParamsSchema.parse(await context.params);
