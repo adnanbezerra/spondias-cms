@@ -10,6 +10,7 @@ import {
 import { ConflictError, NotFoundError, ValidationError } from "@/src/server/shared/errors";
 import { left, right, type Either } from "@/src/server/shared/either";
 import {
+  productSectionsOutputSchema,
   productOutputSchema,
   type ProductCreateInput,
   type ProductUpdateInput,
@@ -26,6 +27,15 @@ export class ProductService {
   async list(): Promise<Either<never, ProductRecord[]>> {
     const products = await this.productRepository.list();
     return right(products.map((item) => productOutputSchema.parse(item)));
+  }
+
+  async getById(id: string): Promise<Either<ProductError, ProductRecord>> {
+    const product = await this.productRepository.findById(id);
+    if (!product) {
+      return left(new NotFoundError("Produto não encontrado."));
+    }
+
+    return right(productOutputSchema.parse(product));
   }
 
   async create(input: ProductCreateInput): Promise<Either<ProductError, ProductRecord>> {
@@ -91,5 +101,17 @@ export class ProductService {
 
     await this.productRepository.replaceSections(id, uniqueSectionIds);
     return right({ updated: true });
+  }
+
+  async listSectionIds(
+    id: string,
+  ): Promise<Either<ProductError, { sectionIds: string[] }>> {
+    const product = await this.productRepository.findById(id);
+    if (!product) {
+      return left(new NotFoundError("Produto não encontrado."));
+    }
+
+    const sectionIds = await this.productRepository.listSectionIds(id);
+    return right(productSectionsOutputSchema.parse({ sectionIds }));
   }
 }

@@ -24,6 +24,7 @@ export type SectionRepository = {
   ): Promise<SectionRecord | null>;
   delete(id: string): Promise<boolean>;
   replaceCategories(sectionId: string, categoryIds: string[]): Promise<void>;
+  listCategoryIds(sectionId: string): Promise<string[]>;
 };
 
 export const prismaSectionRepository: SectionRepository = {
@@ -89,5 +90,14 @@ export const prismaSectionRepository: SectionRepository = {
           ]
         : []),
     ]);
+  },
+  async listCategoryIds(sectionId) {
+    const rows = await getPrismaClient().sectionCategory.findMany({
+      where: { sectionId },
+      select: { categoryId: true },
+      orderBy: { categoryId: "asc" },
+    });
+
+    return rows.map((row) => row.categoryId);
   },
 };

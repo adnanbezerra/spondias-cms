@@ -26,6 +26,10 @@ export const productReplaceSectionsInputSchema = z.object({
   sectionIds: z.array(z.uuid()).max(200),
 });
 
+export const productSectionsOutputSchema = z.object({
+  sectionIds: z.array(z.uuid()),
+});
+
 export const productOutputSchema = z.object({
   id: z.uuid(),
   name: z.string(),
