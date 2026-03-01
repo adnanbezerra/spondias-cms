@@ -68,7 +68,7 @@ const defaultConfig: PublicStoreConfig = {
 
 const fallbackSections: PublicSection[] = [
     {
-        id: "section-sol-pleno",
+        id: "11111111-1111-4111-8111-111111111111",
         name: "Plantas de Sol Pleno",
         description:
             "Espécies resistentes para áreas externas com alta incidência solar.",
@@ -76,7 +76,7 @@ const fallbackSections: PublicSection[] = [
         bannerImage: null,
         products: [
             {
-                id: "product-jiboia-limao",
+                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
                 name: "Jiboia Limão",
                 description: "Folhagem ornamental de fácil cuidado.",
                 priceInCents: 4590,
@@ -85,7 +85,7 @@ const fallbackSections: PublicSection[] = [
                 image: "/logo.jpg",
             },
             {
-                id: "product-zamioculca",
+                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
                 name: "Zamioculca",
                 description: "Ideal para iniciantes e ambientes internos.",
                 priceInCents: 6990,
@@ -96,7 +96,7 @@ const fallbackSections: PublicSection[] = [
         ],
     },
     {
-        id: "section-banner",
+        id: "22222222-2222-4222-8222-222222222222",
         name: "Oferta da Semana",
         description: "Aproveite descontos especiais em plantas selecionadas.",
         isBanner: true,
@@ -104,14 +104,14 @@ const fallbackSections: PublicSection[] = [
         products: [],
     },
     {
-        id: "section-pendentes",
+        id: "33333333-3333-4333-8333-333333333333",
         name: "Plantas para Vasos Suspensos",
         description: "Seção para espécies pendentes e decoração vertical.",
         isBanner: false,
         bannerImage: null,
         products: [
             {
-                id: "product-hera-inglesa",
+                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3",
                 name: "Hera Inglesa",
                 description:
                     "Crescimento vigoroso para jardineiras e suportes.",
@@ -121,7 +121,7 @@ const fallbackSections: PublicSection[] = [
                 image: "/logo.jpg",
             },
             {
-                id: "product-colar-de-perolas",
+                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4",
                 name: "Colar de Pérolas",
                 description: "Visual delicado para ambientes bem iluminados.",
                 priceInCents: 5490,
