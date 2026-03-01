@@ -6,58 +6,58 @@ import { categoryOutputSchema, type CategoryCreateInput, type CategoryUpdateInpu
 export type CategoryError = ConflictError | NotFoundError;
 
 export class CategoryService {
-  constructor(private readonly repository: CategoryRepository = prismaCategoryRepository) {}
+    constructor(private readonly repository: CategoryRepository = prismaCategoryRepository) {}
 
-  async list(): Promise<Either<never, CategoryRecord[]>> {
-    const categories = await this.repository.list();
-    return right(categories.map((item) => categoryOutputSchema.parse(item)));
-  }
-
-  async getById(id: string): Promise<Either<NotFoundError, CategoryRecord>> {
-    const category = await this.repository.findById(id);
-    if (!category) {
-      return left(new NotFoundError("Categoria não encontrada."));
+    async list(): Promise<Either<never, CategoryRecord[]>> {
+        const categories = await this.repository.list();
+        return right(categories.map((item) => categoryOutputSchema.parse(item)));
     }
 
-    return right(categoryOutputSchema.parse(category));
-  }
+    async getById(id: string): Promise<Either<NotFoundError, CategoryRecord>> {
+        const category = await this.repository.findById(id);
+        if (!category) {
+            return left(new NotFoundError("Categoria não encontrada."));
+        }
 
-  async create(input: CategoryCreateInput): Promise<Either<CategoryError, CategoryRecord>> {
-    const found = await this.repository.findByName(input.name);
-    if (found) {
-      return left(new ConflictError("Categoria já cadastrada."));
+        return right(categoryOutputSchema.parse(category));
     }
 
-    const created = await this.repository.create({
-      name: input.name,
-      isActive: input.isActive,
-    });
+    async create(input: CategoryCreateInput): Promise<Either<CategoryError, CategoryRecord>> {
+        const found = await this.repository.findByName(input.name);
+        if (found) {
+            return left(new ConflictError("Categoria já cadastrada."));
+        }
 
-    return right(categoryOutputSchema.parse(created));
-  }
+        const created = await this.repository.create({
+            name: input.name,
+            isActive: input.isActive,
+        });
 
-  async update(id: string, input: CategoryUpdateInput): Promise<Either<CategoryError, CategoryRecord>> {
-    if (input.name) {
-      const foundByName = await this.repository.findByName(input.name);
-      if (foundByName && foundByName.id !== id) {
-        return left(new ConflictError("Nome da categoria já utilizado."));
-      }
+        return right(categoryOutputSchema.parse(created));
     }
 
-    const updated = await this.repository.update(id, input);
-    if (!updated) {
-      return left(new NotFoundError("Categoria não encontrada."));
+    async update(id: string, input: CategoryUpdateInput): Promise<Either<CategoryError, CategoryRecord>> {
+        if (input.name) {
+            const foundByName = await this.repository.findByName(input.name);
+            if (foundByName && foundByName.id !== id) {
+                return left(new ConflictError("Nome da categoria já utilizado."));
+            }
+        }
+
+        const updated = await this.repository.update(id, input);
+        if (!updated) {
+            return left(new NotFoundError("Categoria não encontrada."));
+        }
+
+        return right(categoryOutputSchema.parse(updated));
     }
 
-    return right(categoryOutputSchema.parse(updated));
-  }
+    async delete(id: string): Promise<Either<CategoryError, { deleted: true }>> {
+        const deleted = await this.repository.delete(id);
+        if (!deleted) {
+            return left(new NotFoundError("Categoria não encontrada."));
+        }
 
-  async delete(id: string): Promise<Either<CategoryError, { deleted: true }>> {
-    const deleted = await this.repository.delete(id);
-    if (!deleted) {
-      return left(new NotFoundError("Categoria não encontrada."));
+        return right({ deleted: true });
     }
-
-    return right({ deleted: true });
-  }
 }
