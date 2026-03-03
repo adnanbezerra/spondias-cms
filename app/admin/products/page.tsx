@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AdminNav } from "@/src/components/admin/admin-nav";
+import { AdminSidebar } from "@/src/components/admin/admin-sidebar";
 import { useAdminToast } from "@/src/components/admin/admin-toast";
 import { fetchJson, uploadImage, type AdminProduct, type AdminSection } from "@/src/components/admin/admin-api";
 
@@ -154,188 +154,198 @@ export default function AdminProductsPage() {
     };
 
     return (
-        <main>
-            <AdminNav />
-            <section className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr,1.2fr]">
-                <form
-                    onSubmit={onSubmitProduct}
-                    className="space-y-4 rounded-2xl border border-[#334D40]/15 bg-white/80 p-5 shadow-sm"
-                >
-                    <h1 className="text-2xl font-semibold [font-family:var(--font-title)]">
-                        {editingProductId ? "Editar produto" : "Novo produto"}
+        <div className="min-h-screen bg-[#F5F4EF] text-[#334D40]">
+            <AdminSidebar />
+            <main className="px-4 py-6 sm:px-6 lg:ml-72 lg:px-10 lg:py-10">
+                <header className="mb-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#334D40]/65">
+                        Catálogo
+                    </p>
+                    <h1 className="mt-1 text-4xl font-semibold [font-family:var(--font-title)]">
+                        Produtos
                     </h1>
+                </header>
+                <section className="grid gap-6 lg:grid-cols-[1fr,1.2fr]">
+                    <form
+                        onSubmit={onSubmitProduct}
+                        className="space-y-4 rounded-2xl border border-[#334D40]/15 bg-white p-5 shadow-sm"
+                    >
+                        <h2 className="text-2xl font-semibold [font-family:var(--font-title)]">
+                            {editingProductId ? "Editar produto" : "Novo produto"}
+                        </h2>
 
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium">Nome</label>
-                        <input
-                            value={name}
-                            onChange={(event) => setName(event.target.value)}
-                            className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
-                            required
-                            minLength={2}
-                        />
-                    </div>
-
-                    <div className="grid gap-3 sm:grid-cols-2">
                         <div className="space-y-1">
-                            <label className="text-sm font-medium">Preço (centavos)</label>
+                            <label className="text-sm font-medium">Nome</label>
+                            <input
+                                value={name}
+                                onChange={(event) => setName(event.target.value)}
+                                className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                                required
+                                minLength={2}
+                            />
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium">Preço (centavos)</label>
+                                <input
+                                    type="number"
+                                    value={price}
+                                    onChange={(event) => setPrice(Number(event.target.value))}
+                                    className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                                    min={0}
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium">Estoque</label>
+                                <input
+                                    type="number"
+                                    value={stock}
+                                    onChange={(event) => setStock(Number(event.target.value))}
+                                    className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                                    min={0}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium">Desconto (%)</label>
                             <input
                                 type="number"
-                                value={price}
-                                onChange={(event) => setPrice(Number(event.target.value))}
+                                value={discountPercentage}
+                                onChange={(event) => setDiscountPercentage(Number(event.target.value))}
                                 className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
                                 min={0}
+                                max={100}
                                 required
                             />
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium">Estoque</label>
+
+                        <label className="flex items-center gap-2 text-sm">
                             <input
-                                type="number"
-                                value={stock}
-                                onChange={(event) => setStock(Number(event.target.value))}
-                                className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
-                                min={0}
-                                required
+                                type="checkbox"
+                                checked={isActive}
+                                onChange={(event) => setIsActive(event.target.checked)}
                             />
+                            Produto ativo
+                        </label>
+
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium">Imagem do produto</label>
+                            <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                onChange={(event) => setImageFile(event.target.files?.item(0) ?? null)}
+                                className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                            />
+                            {currentImageUrl ? (
+                                <p className="text-xs text-[#334D40]/75 break-all">
+                                    Imagem atual: {currentImageUrl}
+                                </p>
+                            ) : null}
                         </div>
-                    </div>
 
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium">Desconto (%)</label>
-                        <input
-                            type="number"
-                            value={discountPercentage}
-                            onChange={(event) => setDiscountPercentage(Number(event.target.value))}
-                            className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
-                            min={0}
-                            max={100}
-                            required
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">Seções do produto</p>
+                            <div className="max-h-36 space-y-1 overflow-y-auto rounded-xl border border-[#334D40]/15 bg-white p-2">
+                                {sections.length === 0 ? (
+                                    <p className="text-sm text-[#334D40]/75">
+                                        Cadastre seções antes de criar vínculos.
+                                    </p>
+                                ) : (
+                                    sections.map((section) => (
+                                        <label key={section.id} className="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedSectionIds.includes(section.id)}
+                                                onChange={() => onToggleSection(section.id)}
+                                            />
+                                            {section.name}
+                                        </label>
+                                    ))
+                                )}
+                            </div>
+                        </div>
 
-                    <label className="flex items-center gap-2 text-sm">
-                        <input
-                            type="checkbox"
-                            checked={isActive}
-                            onChange={(event) => setIsActive(event.target.checked)}
-                        />
-                        Produto ativo
-                    </label>
-
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium">Imagem do produto</label>
-                        <input
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            onChange={(event) => setImageFile(event.target.files?.item(0) ?? null)}
-                            className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
-                        />
-                        {currentImageUrl ? (
-                            <p className="text-xs text-[#334D40]/75 break-all">
-                                Imagem atual: {currentImageUrl}
+                        {errorMessage ? (
+                            <p className="rounded-xl bg-red-100 px-3 py-2 text-sm text-red-800">
+                                {errorMessage}
                             </p>
                         ) : null}
-                    </div>
 
-                    <div className="space-y-2">
-                        <p className="text-sm font-medium">Seções do produto</p>
-                        <div className="max-h-36 space-y-1 overflow-y-auto rounded-xl border border-[#334D40]/15 bg-white p-2">
-                            {sections.length === 0 ? (
-                                <p className="text-sm text-[#334D40]/75">
-                                    Cadastre seções antes de criar vínculos.
-                                </p>
-                            ) : (
-                                sections.map((section) => (
-                                    <label key={section.id} className="flex items-center gap-2 text-sm">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedSectionIds.includes(section.id)}
-                                            onChange={() => onToggleSection(section.id)}
-                                        />
-                                        {section.name}
-                                    </label>
-                                ))
-                            )}
-                        </div>
-                    </div>
-
-                    {errorMessage ? (
-                        <p className="rounded-xl bg-red-100 px-3 py-2 text-sm text-red-800">
-                            {errorMessage}
-                        </p>
-                    ) : null}
-
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="rounded-xl bg-[#334D40] px-4 py-2 font-semibold text-[#DBD7CB] disabled:opacity-70"
-                    >
-                        {isSubmitting
-                            ? "Salvando..."
-                            : editingProductId
-                                ? "Salvar alterações"
-                                : "Criar produto"}
-                    </button>
-                    {editingProductId ? (
                         <button
-                            type="button"
-                            onClick={resetForm}
-                            className="ml-2 rounded-xl border border-[#334D40]/20 px-4 py-2 text-sm"
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="rounded-xl bg-[#334D40] px-4 py-2 font-semibold text-[#DBD7CB] disabled:opacity-70"
                         >
-                            Cancelar edição
+                            {isSubmitting
+                                ? "Salvando..."
+                                : editingProductId
+                                    ? "Salvar alterações"
+                                    : "Criar produto"}
                         </button>
-                    ) : null}
-                </form>
-
-                <div className="space-y-3 rounded-2xl border border-[#334D40]/15 bg-white/80 p-5 shadow-sm">
-                    <h2 className="text-xl font-semibold [font-family:var(--font-title)]">
-                        Produtos cadastrados
-                    </h2>
-                    {products.length === 0 ? (
-                        <p className="text-sm text-[#334D40]/80">Nenhum produto cadastrado.</p>
-                    ) : (
-                        products.map((product) => (
-                            <article
-                                key={product.id}
-                                className="rounded-xl border border-[#334D40]/15 bg-white p-3"
+                        {editingProductId ? (
+                            <button
+                                type="button"
+                                onClick={resetForm}
+                                className="ml-2 rounded-xl border border-[#334D40]/20 px-4 py-2 text-sm"
                             >
-                                <div className="flex items-start justify-between gap-3">
-                                    <div>
-                                        <p className="font-semibold">{product.name}</p>
-                                        <p className="text-xs text-[#334D40]/75">
-                                            Preço: {product.price} centavos · Estoque: {product.stock}
-                                        </p>
-                                        <p className="text-xs text-[#334D40]/75">
-                                            Desconto: {product.discountPercentage}% ·{" "}
-                                            {product.isActive ? "Ativo" : "Inativo"}
-                                        </p>
-                                        {product.image ? (
-                                            <p className="mt-1 text-xs text-[#334D40]/75 break-all">
-                                                Imagem: {product.image}
+                                Cancelar edição
+                            </button>
+                        ) : null}
+                    </form>
+
+                    <div className="space-y-3 rounded-2xl border border-[#334D40]/15 bg-white p-5 shadow-sm">
+                        <h2 className="text-xl font-semibold [font-family:var(--font-title)]">
+                            Produtos cadastrados
+                        </h2>
+                        {products.length === 0 ? (
+                            <p className="text-sm text-[#334D40]/80">Nenhum produto cadastrado.</p>
+                        ) : (
+                            products.map((product) => (
+                                <article
+                                    key={product.id}
+                                    className="rounded-xl border border-[#334D40]/15 bg-white p-3"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p className="font-semibold">{product.name}</p>
+                                            <p className="text-xs text-[#334D40]/75">
+                                                Preço: {product.price} centavos · Estoque: {product.stock}
                                             </p>
-                                        ) : null}
+                                            <p className="text-xs text-[#334D40]/75">
+                                                Desconto: {product.discountPercentage}% ·{" "}
+                                                {product.isActive ? "Ativo" : "Inativo"}
+                                            </p>
+                                            {product.image ? (
+                                                <p className="mt-1 text-xs text-[#334D40]/75 break-all">
+                                                    Imagem: {product.image}
+                                                </p>
+                                            ) : null}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => onEditProduct(product.id)}
+                                            className="rounded-lg border border-[#334D40]/20 px-2 py-1 text-xs"
+                                        >
+                                            Editar
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => onDeleteProduct(product.id)}
+                                            className="rounded-lg border border-red-200 px-2 py-1 text-xs text-red-700"
+                                        >
+                                            Excluir
+                                        </button>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => onEditProduct(product.id)}
-                                        className="rounded-lg border border-[#334D40]/20 px-2 py-1 text-xs"
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => onDeleteProduct(product.id)}
-                                        className="rounded-lg border border-red-200 px-2 py-1 text-xs text-red-700"
-                                    >
-                                        Excluir
-                                    </button>
-                                </div>
-                            </article>
-                        ))
-                    )}
-                </div>
-            </section>
-        </main>
+                                </article>
+                            ))
+                        )}
+                    </div>
+                </section>
+            </main>
+        </div>
     );
 }
