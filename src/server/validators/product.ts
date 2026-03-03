@@ -1,11 +1,16 @@
 import { z } from "zod";
 
+const imageReferenceSchema = z.string().refine(
+    (value) => value.startsWith("/") || URL.canParse(value),
+    "URL da imagem inválida.",
+);
+
 export const productCreateInputSchema = z.object({
     name: z.string().min(2),
     price: z.number().int().nonnegative(),
     stock: z.number().int().nonnegative(),
     discountPercentage: z.number().int().min(0).max(100).optional().default(0),
-    image: z.string().url().nullable().optional(),
+    image: imageReferenceSchema.nullable().optional(),
     isActive: z.boolean().optional().default(true),
 });
 
@@ -14,7 +19,7 @@ export const productUpdateInputSchema = z.object({
     price: z.number().int().nonnegative().optional(),
     stock: z.number().int().nonnegative().optional(),
     discountPercentage: z.number().int().min(0).max(100).optional(),
-    image: z.string().url().nullable().optional(),
+    image: imageReferenceSchema.nullable().optional(),
     isActive: z.boolean().optional(),
 });
 

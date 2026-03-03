@@ -1,11 +1,16 @@
 import { z } from "zod";
 
+const bannerReferenceSchema = z.string().refine(
+    (value) => value.startsWith("/") || URL.canParse(value),
+    "URL da imagem de banner inválida.",
+);
+
 export const sectionCreateInputSchema = z.object({
     name: z.string().min(2),
     isActive: z.boolean().optional().default(true),
     order: z.number().int().nonnegative(),
     isBanner: z.boolean().optional().default(false),
-    bannerImg: z.string().url().nullable().optional(),
+    bannerImg: bannerReferenceSchema.nullable().optional(),
 });
 
 export const sectionUpdateInputSchema = z.object({
@@ -13,7 +18,7 @@ export const sectionUpdateInputSchema = z.object({
     isActive: z.boolean().optional(),
     order: z.number().int().nonnegative().optional(),
     isBanner: z.boolean().optional(),
-    bannerImg: z.string().url().nullable().optional(),
+    bannerImg: bannerReferenceSchema.nullable().optional(),
 });
 
 export const sectionIdParamsSchema = z.object({

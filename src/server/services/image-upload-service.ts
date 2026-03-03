@@ -1,6 +1,7 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
+import { extname } from "node:path";
 import { randomUUID } from "node:crypto";
+import { getMongooseConnection } from "@/src/server/db/mongoose";
+import { ImageModel } from "@/src/server/models/image";
 import { left, right, type Either } from "@/src/server/shared/either";
 import { ValidationError } from "@/src/server/shared/errors";
 import {
@@ -17,9 +18,6 @@ const MIME_TO_EXTENSION: Record<string, string> = {
     "image/webp": ".webp",
 };
 
-const getUploadsDirectoryPath = (): string =>
-    join(process.cwd(), "public", "uploads");
-
 export class ImageUploadService {
     async uploadImage(
         input: ImageUploadInput,
@@ -35,16 +33,20 @@ export class ImageUploadService {
                 ? originalExtension
                 : extensionFromMimeType;
         const fileName = `${randomUUID()}${extension}`;
-        const uploadsPath = getUploadsDirectoryPath();
-        const targetPath = join(uploadsPath, fileName);
-
-        await mkdir(uploadsPath, { recursive: true });
         const fileBytes = await input.file.arrayBuffer();
-        await writeFile(targetPath, Buffer.from(fileBytes));
+        const fileBuffer = Buffer.from(fileBytes);
+
+        await getMongooseConnection();
+        const createdImage = await ImageModel.create({
+            fileName,
+            mimeType: input.mimeType,
+            size: input.size,
+            data: fileBuffer,
+        });
 
         return right(
             imageUploadOutputSchema.parse({
-                url: `/uploads/${fileName}`,
+                url: `/api/public/images/${createdImage.id}`,
                 fileName,
                 mimeType: input.mimeType,
                 size: input.size,

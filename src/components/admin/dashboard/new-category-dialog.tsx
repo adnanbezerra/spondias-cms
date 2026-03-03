@@ -10,6 +10,11 @@ type NewCategoryDialogProps = {
     onChange: (next: CategoryForm) => void;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     isSubmitting: boolean;
+    title?: string;
+    description?: string;
+    submitLabel?: string;
+    triggerLabel?: string;
+    showTrigger?: boolean;
 };
 
 export const NewCategoryDialog = ({
@@ -19,24 +24,29 @@ export const NewCategoryDialog = ({
     onChange,
     onSubmit,
     isSubmitting,
+    title = "Nova Categoria",
+    description = "Crie a categoria e publique na vitrine quando quiser.",
+    submitLabel = "Salvar Categoria",
+    triggerLabel = "Adicionar Nova Categoria",
+    showTrigger = true,
 }: NewCategoryDialogProps) => {
     return (
         <DashboardActionDialog
             open={open}
             onOpenChange={onOpenChange}
-            title="Nova Categoria"
-            description="Crie a categoria e publique na vitrine quando quiser."
+            title={title}
+            description={description}
             onSubmit={onSubmit}
             isSubmitting={isSubmitting}
-            submitLabel="Salvar Categoria"
-            trigger={
+            submitLabel={submitLabel}
+            trigger={showTrigger ? (
                 <button
                     type="button"
-                    className="rounded-xl border border-[#334D40]/20 bg-[#DBD7CB]/60 px-5 py-3 text-sm font-semibold"
+                    className="cursor-pointer rounded-xl border border-[#334D40]/20 bg-[#DBD7CB]/60 px-5 py-3 text-sm font-semibold"
                 >
-                    Adicionar Nova Categoria
+                    {triggerLabel}
                 </button>
-            }
+            ) : null}
         >
             <div className="space-y-1">
                 <label className="text-sm font-medium">Nome da categoria</label>

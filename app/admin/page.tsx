@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { AdminSidebar } from "@/src/components/admin/admin-sidebar";
 import {
     fetchJson,
+    uploadImage,
     type AdminCategory,
     type AdminProduct,
     type AdminSection,
@@ -27,6 +28,7 @@ export default function AdminDashboardPage() {
         useState<CategoryForm>(initialCategoryForm);
     const [productForm, setProductForm] =
         useState<ProductForm>(initialProductForm);
+    const [productImageFile, setProductImageFile] = useState<File | null>(null);
     const [selectedSectionIds, setSelectedSectionIds] = useState<string[]>([]);
     const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
     const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
@@ -85,15 +87,17 @@ export default function AdminDashboardPage() {
         setIsProductSubmitting(true);
 
         try {
+            const imageUrl = productImageFile
+                ? (await uploadImage(productImageFile)).url
+                : null;
+
             const createdProduct = await fetchJson<AdminProduct>(
                 "/api/admin/products",
                 {
                     method: "POST",
                     body: JSON.stringify({
                         ...productForm,
-                        image: productForm.image.trim()
-                            ? productForm.image.trim()
-                            : null,
+                        image: imageUrl,
                     }),
                 },
             );
@@ -107,6 +111,7 @@ export default function AdminDashboardPage() {
             );
 
             setProductForm(initialProductForm);
+            setProductImageFile(null);
             setSelectedSectionIds([]);
             setIsProductDialogOpen(false);
             await loadData();
@@ -155,6 +160,7 @@ export default function AdminDashboardPage() {
                         sections={sections}
                         selectedSectionIds={selectedSectionIds}
                         onToggleSection={onToggleSection}
+                        onImageFileChange={setProductImageFile}
                         onSubmit={onSubmitProduct}
                         isSubmitting={isProductSubmitting}
                     />

@@ -12,8 +12,15 @@ type NewProductDialogProps = {
     sections: AdminSection[];
     selectedSectionIds: string[];
     onToggleSection: (sectionId: string) => void;
+    currentImageUrl?: string | null;
+    onImageFileChange: (file: File | null) => void;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     isSubmitting: boolean;
+    title?: string;
+    description?: string;
+    submitLabel?: string;
+    triggerLabel?: string;
+    showTrigger?: boolean;
 };
 
 export const NewProductDialog = ({
@@ -24,26 +31,33 @@ export const NewProductDialog = ({
     sections,
     selectedSectionIds,
     onToggleSection,
+    currentImageUrl = null,
+    onImageFileChange,
     onSubmit,
     isSubmitting,
+    title = "Novo Produto",
+    description = "Cadastro rápido de produto sem sair do dashboard.",
+    submitLabel = "Salvar Produto",
+    triggerLabel = "Adicionar Novo Produto",
+    showTrigger = true,
 }: NewProductDialogProps) => {
     return (
         <DashboardActionDialog
             open={open}
             onOpenChange={onOpenChange}
-            title="Novo Produto"
-            description="Cadastro rápido de produto sem sair do dashboard."
+            title={title}
+            description={description}
             onSubmit={onSubmit}
             isSubmitting={isSubmitting}
-            submitLabel="Salvar Produto"
-            trigger={
+            submitLabel={submitLabel}
+            trigger={showTrigger ? (
                 <button
                     type="button"
-                    className="rounded-xl bg-[#334D40] px-5 py-3 text-sm font-semibold text-[#DBD7CB]"
+                    className="cursor-pointer rounded-xl bg-[#334D40] px-5 py-3 text-sm font-semibold text-[#DBD7CB]"
                 >
-                    Adicionar Novo Produto
+                    {triggerLabel}
                 </button>
-            }
+            ) : null}
         >
             <div className="space-y-1">
                 <label className="text-sm font-medium">Nome</label>
@@ -114,19 +128,20 @@ export const NewProductDialog = ({
             </div>
 
             <div className="space-y-1">
-                <label className="text-sm font-medium">URL da imagem</label>
+                <label className="text-sm font-medium">Imagem do produto</label>
                 <input
-                    type="url"
-                    placeholder="https://..."
-                    value={form.image}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
                     onChange={(event) =>
-                        onChange({
-                            ...form,
-                            image: event.target.value,
-                        })
+                        onImageFileChange(event.target.files?.item(0) ?? null)
                     }
                     className="w-full rounded-xl border border-[#334D40]/20 px-3 py-2"
                 />
+                {currentImageUrl ? (
+                    <p className="text-xs text-[#334D40]/75 break-all">
+                        Imagem atual: {currentImageUrl}
+                    </p>
+                ) : null}
             </div>
 
             <label className="flex items-center gap-2 text-sm">

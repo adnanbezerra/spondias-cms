@@ -289,7 +289,7 @@ export default function AdminSectionsPage() {
                             <button
                                 type="button"
                                 onClick={onOpenCreate}
-                                className="rounded-xl bg-[#334D40] px-4 py-2.5 text-sm font-semibold text-[#DBD7CB]"
+                                className="cursor-pointer rounded-xl bg-[#334D40] px-4 py-2.5 text-sm font-semibold text-[#DBD7CB]"
                             >
                                 Nova Seção
                             </button>

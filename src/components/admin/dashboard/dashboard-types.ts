@@ -8,7 +8,6 @@ export type ProductForm = {
     price: number;
     stock: number;
     discountPercentage: number;
-    image: string;
     isActive: boolean;
 };
 
@@ -22,6 +21,5 @@ export const initialProductForm: ProductForm = {
     price: 0,
     stock: 0,
     discountPercentage: 0,
-    image: "",
     isActive: true,
 };

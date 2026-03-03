@@ -16,7 +16,7 @@ import {
 type DashboardActionDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    trigger: ReactNode;
+    trigger?: ReactNode;
     title: string;
     description: string;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
@@ -38,7 +38,7 @@ export const DashboardActionDialog = ({
 }: DashboardActionDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogTrigger asChild>{trigger}</DialogTrigger>
+            {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
             <DialogOverlay />
             <DialogContent>
                 <form onSubmit={onSubmit}>
