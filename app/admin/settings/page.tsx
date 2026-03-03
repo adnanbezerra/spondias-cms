@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AdminNav } from "@/src/components/admin/admin-nav";
+import { AdminSidebar } from "@/src/components/admin/admin-sidebar";
 import { useAdminToast } from "@/src/components/admin/admin-toast";
 import { fetchJson, type AdminStoreConfig } from "@/src/components/admin/admin-api";
 
@@ -79,99 +79,109 @@ export default function AdminSettingsPage() {
     };
 
     return (
-        <main>
-            <AdminNav />
-            <section className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
-                <form
-                    onSubmit={onSubmit}
-                    className="space-y-4 rounded-2xl border border-[#334D40]/15 bg-white/80 p-5 shadow-sm"
-                >
-                    <h1 className="text-2xl font-semibold [font-family:var(--font-title)]">
-                        Configurações da loja
-                    </h1>
-                    <p className="text-sm text-[#334D40]/80">
-                        Dados exibidos no site público e usados no contato comercial.
+        <div className="min-h-screen bg-[#F5F4EF] text-[#334D40]">
+            <AdminSidebar />
+            <main className="px-4 py-6 sm:px-6 lg:ml-72 lg:px-10 lg:py-10">
+                <header className="mb-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#334D40]/65">
+                        Loja
                     </p>
-
-                    <div className="grid gap-3 sm:grid-cols-2">
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium">WhatsApp</label>
-                            <input
-                                value={form.whatsappNumber}
-                                onChange={(event) => onChangeField("whatsappNumber", event.target.value)}
-                                className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
-                                required
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium">Email</label>
-                            <input
-                                type="email"
-                                value={form.email}
-                                onChange={(event) => onChangeField("email", event.target.value)}
-                                className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium">Endereço</label>
-                        <input
-                            value={form.address}
-                            onChange={(event) => onChangeField("address", event.target.value)}
-                            className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
-                            required
-                        />
-                    </div>
-
-                    <div className="grid gap-3 sm:grid-cols-2">
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium">Nome da empresa</label>
-                            <input
-                                value={form.companyName}
-                                onChange={(event) => onChangeField("companyName", event.target.value)}
-                                className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
-                                required
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium">CNPJ</label>
-                            <input
-                                value={form.cnpj}
-                                onChange={(event) => onChangeField("cnpj", event.target.value)}
-                                className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    {updatedAt ? (
-                        <p className="text-xs text-[#334D40]/70">
-                            Última atualização: {new Date(updatedAt).toLocaleString("pt-BR")}
-                        </p>
-                    ) : null}
-
-                    {errorMessage ? (
-                        <p className="rounded-xl bg-red-100 px-3 py-2 text-sm text-red-800">
-                            {errorMessage}
-                        </p>
-                    ) : null}
-                    {successMessage ? (
-                        <p className="rounded-xl bg-emerald-100 px-3 py-2 text-sm text-emerald-800">
-                            {successMessage}
-                        </p>
-                    ) : null}
-
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="rounded-xl bg-[#334D40] px-4 py-2 font-semibold text-[#DBD7CB] disabled:opacity-70"
+                    <h1 className="mt-1 text-4xl font-semibold [font-family:var(--font-title)]">
+                        Configurações
+                    </h1>
+                </header>
+                <section className="w-full max-w-4xl">
+                    <form
+                        onSubmit={onSubmit}
+                        className="space-y-4 rounded-2xl border border-[#334D40]/15 bg-white p-5 shadow-sm"
                     >
-                        {isSubmitting ? "Salvando..." : "Salvar configurações"}
-                    </button>
-                </form>
-            </section>
-        </main>
+                        <h2 className="text-2xl font-semibold [font-family:var(--font-title)]">
+                            Configurações da loja
+                        </h2>
+                        <p className="text-sm text-[#334D40]/80">
+                            Dados exibidos no site público e usados no contato comercial.
+                        </p>
+
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium">WhatsApp</label>
+                                <input
+                                    value={form.whatsappNumber}
+                                    onChange={(event) => onChangeField("whatsappNumber", event.target.value)}
+                                    className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium">Email</label>
+                                <input
+                                    type="email"
+                                    value={form.email}
+                                    onChange={(event) => onChangeField("email", event.target.value)}
+                                    className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium">Endereço</label>
+                            <input
+                                value={form.address}
+                                onChange={(event) => onChangeField("address", event.target.value)}
+                                className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                                required
+                            />
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium">Nome da empresa</label>
+                                <input
+                                    value={form.companyName}
+                                    onChange={(event) => onChangeField("companyName", event.target.value)}
+                                    className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium">CNPJ</label>
+                                <input
+                                    value={form.cnpj}
+                                    onChange={(event) => onChangeField("cnpj", event.target.value)}
+                                    className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {updatedAt ? (
+                            <p className="text-xs text-[#334D40]/70">
+                                Última atualização: {new Date(updatedAt).toLocaleString("pt-BR")}
+                            </p>
+                        ) : null}
+
+                        {errorMessage ? (
+                            <p className="rounded-xl bg-red-100 px-3 py-2 text-sm text-red-800">
+                                {errorMessage}
+                            </p>
+                        ) : null}
+                        {successMessage ? (
+                            <p className="rounded-xl bg-emerald-100 px-3 py-2 text-sm text-emerald-800">
+                                {successMessage}
+                            </p>
+                        ) : null}
+
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="rounded-xl bg-[#334D40] px-4 py-2 font-semibold text-[#DBD7CB] disabled:opacity-70"
+                        >
+                            {isSubmitting ? "Salvando..." : "Salvar configurações"}
+                        </button>
+                    </form>
+                </section>
+            </main>
+        </div>
     );
 }
