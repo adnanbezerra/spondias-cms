@@ -42,7 +42,10 @@ type UploadImageResponse = {
     size: number;
 };
 
-export const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
+export const fetchJson = async <T>(
+    url: string,
+    init?: RequestInit,
+): Promise<T> => {
     const headers = new Headers(init?.headers);
     if (!(init?.body instanceof FormData) && !headers.has("content-type")) {
         headers.set("content-type", "application/json");
@@ -55,7 +58,9 @@ export const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> 
 
     const payload = (await response.json()) as T | { message?: string };
     if (!response.ok) {
-        throw new Error((payload as { message?: string }).message ?? "Falha na requisição.");
+        throw new Error(
+            (payload as { message?: string }).message ?? "Falha na requisição.",
+        );
     }
 
     return payload as T;
@@ -71,8 +76,8 @@ export const uploadImage = async (file: File): Promise<UploadImageResponse> => {
     });
 
     const payload = (await response.json()) as
-    | UploadImageResponse
-    | { message?: string };
+        | UploadImageResponse
+        | { message?: string };
 
     if (!response.ok) {
         const errorPayload = payload as { message?: string };

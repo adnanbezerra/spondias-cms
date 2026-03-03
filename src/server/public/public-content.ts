@@ -1,24 +1,57 @@
 import { getPrismaClient } from "@/src/server/db/prisma";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { CategoryService } from "@/src/server/services/category-service";
 import { StoreConfigService } from "@/src/server/services/store-config-service";
 
 const categoryService = new CategoryService();
 const storeConfigService = new StoreConfigService();
 
-const sectionWithProductsArgs =
-    Prisma.validator<Prisma.SectionDefaultArgs>()({
-        include: {
-            products: {
-                include: {
-                    product: true,
+const sectionWithProductsArgs = {
+    include: {
+        categories: true,
+        products: {
+            include: {
+                product: true,
+            },
+        },
+    },
+} satisfies Prisma.SectionDefaultArgs;
+
+const categoryWithSectionsArgs = {
+    include: {
+        sections: {
+            include: {
+                section: {
+                    include: {
+                        products: {
+                            include: {
+                                product: true,
+                            },
+                        },
+                    },
                 },
             },
         },
-    });
+    },
+} satisfies Prisma.CategoryDefaultArgs;
 
-type SectionWithProducts = Prisma.SectionGetPayload<typeof sectionWithProductsArgs>;
+type SectionWithProducts = Prisma.SectionGetPayload<
+    typeof sectionWithProductsArgs
+>;
+type CategoryWithSections = Prisma.CategoryGetPayload<
+    typeof categoryWithSectionsArgs
+>;
 type ProductSectionItem = SectionWithProducts["products"][number];
+type CategorySectionItem = CategoryWithSections["sections"][number];
+type ProductEntity = {
+    id: string;
+    name: string;
+    price: number;
+    discountPercentage: number;
+    stock: number;
+    image: string | null;
+    isActive: boolean;
+};
 
 export type PublicStoreConfig = {
     whatsappNumber: string;
@@ -127,7 +160,78 @@ const mapProductSectionToPublicProduct = (
     };
 };
 
-const mapSectionToPublicSection = (section: SectionWithProducts): PublicSection => ({
+const mapProductToPublicProduct = (
+    product: ProductEntity,
+    sectionName: string,
+): PublicProduct | null => {
+    if (!product.isActive) {
+        return null;
+    }
+
+    return {
+        id: product.id,
+        name: product.name,
+        priceInCents: product.price,
+        discountPercentage: product.discountPercentage,
+        stock: product.stock,
+        image: product.image ?? "/logo.jpg",
+        description: sectionName,
+    };
+};
+
+const getSectionProductsByCategories = async (
+    categoryIds: string[],
+    sectionName: string,
+): Promise<PublicProduct[]> => {
+    if (categoryIds.length === 0) {
+        return [];
+    }
+
+    const products = await getPrismaClient().product.findMany({
+        where: {
+            isActive: true,
+            sections: {
+                some: {
+                    section: {
+                        categories: {
+                            some: {
+                                categoryId: {
+                                    in: categoryIds,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        orderBy: [{ name: "asc" }, { createdAt: "desc" }],
+    });
+
+    return products
+        .map((product: ProductEntity) =>
+            mapProductToPublicProduct(product, sectionName),
+        )
+        .filter((product): product is PublicProduct => product !== null);
+};
+
+const getSectionProducts = async (
+    section: SectionWithProducts,
+): Promise<PublicProduct[]> => {
+    const categoryIds = section.categories.map((relation) => relation.categoryId);
+    if (categoryIds.length > 0) {
+        return getSectionProductsByCategories(categoryIds, section.name);
+    }
+
+    return section.products
+        .map((productSection) =>
+            mapProductSectionToPublicProduct(productSection, section.name),
+        )
+        .filter((product): product is PublicProduct => product !== null);
+};
+
+const mapSectionToPublicSection = async (
+    section: SectionWithProducts,
+): Promise<PublicSection> => ({
     id: section.id,
     name: section.name,
     description: section.isBanner
@@ -135,11 +239,7 @@ const mapSectionToPublicSection = (section: SectionWithProducts): PublicSection 
         : "Produtos selecionados para esta seção.",
     isBanner: section.isBanner,
     bannerImage: section.bannerImg,
-    products: section.products
-        .map((productSection) =>
-            mapProductSectionToPublicProduct(productSection, section.name),
-        )
-        .filter((product): product is PublicProduct => product !== null),
+    products: await getSectionProducts(section),
 });
 
 export const getCategoryProducts = async (
@@ -202,7 +302,9 @@ export const getHomeSections = async (): Promise<PublicSection[]> => {
                 orderBy: [{ order: "asc" }, { name: "asc" }],
             });
 
-        return sections.map((section) => mapSectionToPublicSection(section));
+        return Promise.all(
+            sections.map((section) => mapSectionToPublicSection(section)),
+        );
     } catch {
         return [];
     }
@@ -225,7 +327,7 @@ export const getSectionById = async (
             return null;
         }
 
-        return mapSectionToPublicSection(section);
+        return await mapSectionToPublicSection(section);
     } catch {
         return null;
     }
@@ -235,26 +337,12 @@ export const getCategoryById = async (
     categoryId: string,
 ): Promise<PublicCategoryDetails | null> => {
     try {
-        const category = await getPrismaClient().category.findFirst({
-            include: {
-                sections: {
-                    include: {
-                        section: {
-                            include: {
-                                products: {
-                                    include: {
-                                        product: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
+        const category: CategoryWithSections | null = await getPrismaClient().category.findFirst({
             where: {
                 id: categoryId,
                 isActive: true,
             },
+            ...categoryWithSectionsArgs,
         });
 
         if (!category) {
@@ -263,7 +351,7 @@ export const getCategoryById = async (
 
         const productsMap = new Map<string, PublicProduct>();
 
-        category.sections.forEach(({ section }) => {
+        category.sections.forEach(({ section }: CategorySectionItem) => {
             section.products.forEach((productSection) => {
                 const product = mapProductSectionToPublicProduct(
                     productSection,
