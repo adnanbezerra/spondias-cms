@@ -71,7 +71,10 @@ type DialogTriggerProps = {
     children: ReactNode;
 };
 
-export function DialogTrigger({ asChild = false, children }: DialogTriggerProps) {
+export function DialogTrigger({
+    asChild = false,
+    children,
+}: DialogTriggerProps) {
     const { onOpenChange } = useDialogContext();
 
     if (asChild) {

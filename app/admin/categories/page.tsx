@@ -197,8 +197,8 @@ export default function AdminCategoriesPage() {
                             {isSubmitting
                                 ? "Salvando..."
                                 : editingCategoryId
-                                  ? "Salvar alterações"
-                                  : "Criar categoria"}
+                                    ? "Salvar alterações"
+                                    : "Criar categoria"}
                         </button>
                         {editingCategoryId ? (
                             <button
