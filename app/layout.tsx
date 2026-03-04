@@ -7,6 +7,11 @@ export const metadata: Metadata = {
     title: "Spondias | Plantas e Jardinagem",
     description:
         "Loja de plantas da Spondias com catálogo online e atendimento via WhatsApp.",
+    icons: {
+        icon: "/logo.jpg",
+        shortcut: "/logo.jpg",
+        apple: "/logo.jpg",
+    },
 };
 
 export default async function RootLayout({
