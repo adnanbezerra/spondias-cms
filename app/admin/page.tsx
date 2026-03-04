@@ -2,6 +2,7 @@
 
 import { AdminSidebar } from "@/src/components/admin/admin-sidebar";
 import { DashboardQuickActions } from "@/src/components/admin/pages/dashboard/dashboard-quick-actions";
+import { DashboardRecentCategoriesTable } from "@/src/components/admin/pages/dashboard/dashboard-recent-categories-table";
 import { DashboardStatsGrid } from "@/src/components/admin/pages/dashboard/dashboard-stats-grid";
 import { useAdminDashboardPage } from "@/src/components/admin/pages/dashboard/use-admin-dashboard-page";
 
@@ -90,6 +91,11 @@ export default function AdminDashboardPage() {
                             productCount={products.length}
                             categoryCount={categories.length}
                             activeSectionsCount={sections.length}
+                        />
+
+                        <DashboardRecentCategoriesTable
+                            categories={categories}
+                            products={products}
                         />
                     </>
                 )}

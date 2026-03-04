@@ -4,6 +4,8 @@ export type AdminCategory = {
     id: string;
     name: string;
     isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type AdminSection = {
