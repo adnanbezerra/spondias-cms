@@ -12,6 +12,7 @@ export const productCreateInputSchema = z.object({
     discountPercentage: z.number().int().min(0).max(100).optional().default(0),
     image: imageReferenceSchema.nullable().optional(),
     isActive: z.boolean().optional().default(true),
+    categoryIds: z.array(z.uuid()).min(1).max(200),
 });
 
 export const productUpdateInputSchema = z.object({
@@ -21,18 +22,11 @@ export const productUpdateInputSchema = z.object({
     discountPercentage: z.number().int().min(0).max(100).optional(),
     image: imageReferenceSchema.nullable().optional(),
     isActive: z.boolean().optional(),
+    categoryIds: z.array(z.uuid()).min(1).max(200).optional(),
 });
 
 export const productIdParamsSchema = z.object({
     id: z.uuid(),
-});
-
-export const productReplaceSectionsInputSchema = z.object({
-    sectionIds: z.array(z.uuid()).max(200),
-});
-
-export const productSectionsOutputSchema = z.object({
-    sectionIds: z.array(z.uuid()),
 });
 
 export const productOutputSchema = z.object({
@@ -43,12 +37,10 @@ export const productOutputSchema = z.object({
     discountPercentage: z.number().int().min(0).max(100),
     image: z.string().nullable(),
     isActive: z.boolean(),
+    categoryIds: z.array(z.uuid()),
     createdAt: z.date(),
     updatedAt: z.date(),
 });
 
 export type ProductCreateInput = z.infer<typeof productCreateInputSchema>;
 export type ProductUpdateInput = z.infer<typeof productUpdateInputSchema>;
-export type ProductReplaceSectionsInput = z.infer<
-  typeof productReplaceSectionsInputSchema
->;

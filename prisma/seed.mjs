@@ -220,19 +220,6 @@ const seed = async () => {
         });
     }
 
-    const productSectionLinks = seedSections.flatMap((section) =>
-        section.products.map((product) => ({
-            sectionId: section.id,
-            productId: product.id,
-        })),
-    );
-    if (productSectionLinks.length > 0) {
-        await prisma.productSection.createMany({
-            data: productSectionLinks,
-            skipDuplicates: true,
-        });
-    }
-
     const categoryIds = seedCategories.map((category) => category.id);
     const existingCategories = await prisma.category.findMany({
         where: { id: { in: categoryIds } },
@@ -265,6 +252,31 @@ const seed = async () => {
     if (sectionCategoryLinks.length > 0) {
         await prisma.sectionCategory.createMany({
             data: sectionCategoryLinks,
+            skipDuplicates: true,
+        });
+    }
+
+    const categoryIdsBySection = new Map();
+    seedCategories.forEach((category) => {
+        category.sectionIds.forEach((sectionId) => {
+            const current = categoryIdsBySection.get(sectionId) ?? [];
+            categoryIdsBySection.set(sectionId, [...current, category.id]);
+        });
+    });
+
+    const productCategoryLinks = seedSections.flatMap((section) =>
+        section.products.flatMap((product) => {
+            const relatedCategoryIds = categoryIdsBySection.get(section.id) ?? [];
+            return relatedCategoryIds.map((categoryId) => ({
+                productId: product.id,
+                categoryId,
+            }));
+        }),
+    );
+
+    if (productCategoryLinks.length > 0) {
+        await prisma.productCategory.createMany({
+            data: productCategoryLinks,
             skipDuplicates: true,
         });
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { type AdminSection } from "@/src/components/admin/admin-api";
+import { type AdminCategory } from "@/src/components/admin/admin-api";
 import { DashboardActionDialog } from "@/src/components/admin/dashboard/dashboard-action-dialog";
 import { type ProductForm } from "@/src/components/admin/dashboard/dashboard-types";
 
@@ -9,9 +9,9 @@ type NewProductDialogProps = {
     onOpenChange: (open: boolean) => void;
     form: ProductForm;
     onChange: (next: ProductForm) => void;
-    sections: AdminSection[];
-    selectedSectionIds: string[];
-    onToggleSection: (sectionId: string) => void;
+    categories: AdminCategory[];
+    selectedCategoryIds: string[];
+    onToggleCategory: (categoryId: string) => void;
     currentImageUrl?: string | null;
     onImageFileChange: (file: File | null) => void;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
@@ -28,9 +28,9 @@ export const NewProductDialog = ({
     onOpenChange,
     form,
     onChange,
-    sections,
-    selectedSectionIds,
-    onToggleSection,
+    categories,
+    selectedCategoryIds,
+    onToggleCategory,
     currentImageUrl = null,
     onImageFileChange,
     onSubmit,
@@ -159,26 +159,26 @@ export const NewProductDialog = ({
             </label>
 
             <div className="space-y-2">
-                <p className="text-sm font-medium">Seções do produto</p>
+                <p className="text-sm font-medium">Categorias do produto</p>
                 <div className="max-h-32 space-y-1 overflow-y-auto rounded-xl border border-[#334D40]/15 p-2">
-                    {sections.length === 0 ? (
+                    {categories.length === 0 ? (
                         <p className="text-sm text-[#334D40]/75">
-                            Cadastre seções antes de vincular.
+                            Cadastre categorias antes de vincular.
                         </p>
                     ) : (
-                        sections.map((section) => (
+                        categories.map((category) => (
                             <label
-                                key={section.id}
+                                key={category.id}
                                 className="flex items-center gap-2 text-sm"
                             >
                                 <input
                                     type="checkbox"
-                                    checked={selectedSectionIds.includes(
-                                        section.id,
+                                    checked={selectedCategoryIds.includes(
+                                        category.id,
                                     )}
-                                    onChange={() => onToggleSection(section.id)}
+                                    onChange={() => onToggleCategory(category.id)}
                                 />
-                                {section.name}
+                                {category.name}
                             </label>
                         ))
                     )}

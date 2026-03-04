@@ -4,13 +4,12 @@ import {
     type ProductRepository,
 } from "@/src/server/repositories/product-repository";
 import {
-    prismaSectionRepository,
-    type SectionRepository,
-} from "@/src/server/repositories/section-repository";
+    prismaCategoryRepository,
+    type CategoryRepository,
+} from "@/src/server/repositories/category-repository";
 import { ConflictError, NotFoundError, ValidationError } from "@/src/server/shared/errors";
 import { left, right, type Either } from "@/src/server/shared/either";
 import {
-    productSectionsOutputSchema,
     productOutputSchema,
     type ProductCreateInput,
     type ProductUpdateInput,
@@ -21,7 +20,7 @@ export type ProductError = ConflictError | NotFoundError | ValidationError;
 export class ProductService {
     constructor(
         private readonly productRepository: ProductRepository = prismaProductRepository,
-        private readonly sectionRepository: SectionRepository = prismaSectionRepository,
+        private readonly categoryRepository: CategoryRepository = prismaCategoryRepository,
     ) {}
 
     async list(): Promise<Either<never, ProductRecord[]>> {
@@ -44,6 +43,16 @@ export class ProductService {
             return left(new ConflictError("Produto já cadastrado."));
         }
 
+        const uniqueCategoryIds = [...new Set(input.categoryIds)];
+        const categories = await Promise.all(
+            uniqueCategoryIds.map((categoryId) =>
+                this.categoryRepository.findById(categoryId),
+            ),
+        );
+        if (categories.some((category) => !category)) {
+            return left(new ValidationError("Uma ou mais categorias não existem."));
+        }
+
         const created = await this.productRepository.create({
             name: input.name,
             price: input.price,
@@ -51,6 +60,7 @@ export class ProductService {
             discountPercentage: input.discountPercentage,
             image: input.image ?? null,
             isActive: input.isActive,
+            categoryIds: uniqueCategoryIds,
         });
 
         return right(productOutputSchema.parse(created));
@@ -64,7 +74,30 @@ export class ProductService {
             }
         }
 
-        const updated = await this.productRepository.update(id, input);
+        const uniqueCategoryIds = input.categoryIds
+            ? [...new Set(input.categoryIds)]
+            : undefined;
+
+        if (uniqueCategoryIds) {
+            const categories = await Promise.all(
+                uniqueCategoryIds.map((categoryId) =>
+                    this.categoryRepository.findById(categoryId),
+                ),
+            );
+            if (categories.some((category) => !category)) {
+                return left(new ValidationError("Uma ou mais categorias não existem."));
+            }
+        }
+
+        const updated = await this.productRepository.update(id, {
+            name: input.name,
+            price: input.price,
+            stock: input.stock,
+            discountPercentage: input.discountPercentage,
+            image: input.image,
+            isActive: input.isActive,
+            categoryIds: uniqueCategoryIds,
+        });
         if (!updated) {
             return left(new NotFoundError("Produto não encontrado."));
         }
@@ -79,39 +112,5 @@ export class ProductService {
         }
 
         return right({ deleted: true });
-    }
-
-    async replaceSections(
-        id: string,
-        sectionIds: string[],
-    ): Promise<Either<ProductError, { updated: true }>> {
-        const product = await this.productRepository.findById(id);
-        if (!product) {
-            return left(new NotFoundError("Produto não encontrado."));
-        }
-
-        const uniqueSectionIds = [...new Set(sectionIds)];
-        const sections = await Promise.all(
-            uniqueSectionIds.map((sectionId) => this.sectionRepository.findById(sectionId)),
-        );
-        const missingSectionId = sections.findIndex((section) => !section);
-        if (missingSectionId >= 0) {
-            return left(new ValidationError("Uma ou mais seções informadas não existem."));
-        }
-
-        await this.productRepository.replaceSections(id, uniqueSectionIds);
-        return right({ updated: true });
-    }
-
-    async listSectionIds(
-        id: string,
-    ): Promise<Either<ProductError, { sectionIds: string[] }>> {
-        const product = await this.productRepository.findById(id);
-        if (!product) {
-            return left(new NotFoundError("Produto não encontrado."));
-        }
-
-        const sectionIds = await this.productRepository.listSectionIds(id);
-        return right(productSectionsOutputSchema.parse({ sectionIds }));
     }
 }

@@ -26,7 +26,6 @@ model Section {
   bannerImg  String?
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
-  products   ProductSection[]
   categories SectionCategory[]
 }
 
@@ -37,6 +36,7 @@ model Category {
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   sections  SectionCategory[]
+  products  ProductCategory[]
 }
 
 model Product {
@@ -49,16 +49,16 @@ model Product {
   isActive           Boolean          @default(true)
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
-  sections           ProductSection[]
+  categories         ProductCategory[]
 }
 
-model ProductSection {
-  productId String
-  sectionId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  section   Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  @@id([productId, sectionId])
+  @@id([productId, categoryId])
 }
 
 model SectionCategory {

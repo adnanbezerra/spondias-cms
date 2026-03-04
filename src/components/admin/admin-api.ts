@@ -23,6 +23,7 @@ export type AdminProduct = {
     discountPercentage: number;
     image: string | null;
     isActive: boolean;
+    categoryIds: string[];
 };
 
 export type AdminStoreConfig = {
