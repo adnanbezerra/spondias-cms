@@ -89,6 +89,14 @@ export class SectionService {
             return left(new NotFoundError("Seção não encontrada."));
         }
 
+        if (section.isBanner && categoryIds.length > 0) {
+            return left(
+                new ValidationError(
+                    "Seções de banner não podem ter categorias vinculadas.",
+                ),
+            );
+        }
+
         const uniqueCategoryIds = [...new Set(categoryIds)];
         const categories = await Promise.all(
             uniqueCategoryIds.map((categoryId) => this.categoryRepository.findById(categoryId)),

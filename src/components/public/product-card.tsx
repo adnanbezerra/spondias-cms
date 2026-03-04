@@ -8,6 +8,7 @@ import {
 type ProductCardProps = {
     product: PublicProduct;
     whatsappNumber: string;
+    className?: string;
 };
 
 const calculateFinalPrice = (
@@ -21,7 +22,11 @@ const calculateFinalPrice = (
     );
 };
 
-export const ProductCard = ({ product, whatsappNumber }: ProductCardProps) => {
+export const ProductCard = ({
+    product,
+    whatsappNumber,
+    className = "",
+}: ProductCardProps) => {
     const finalPrice = calculateFinalPrice(
         product.priceInCents,
         product.discountPercentage,
@@ -32,7 +37,9 @@ export const ProductCard = ({ product, whatsappNumber }: ProductCardProps) => {
     );
 
     return (
-        <article className="rounded-2xl border border-[#334D40]/15 bg-white p-4 shadow-sm">
+        <article
+            className={`rounded-2xl border border-[#334D40]/15 bg-white p-4 shadow-sm ${className}`}
+        >
             <Image
                 src={product.image}
                 alt={product.name}

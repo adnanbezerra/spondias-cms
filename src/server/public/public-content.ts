@@ -6,43 +6,16 @@ import { StoreConfigService } from "@/src/server/services/store-config-service";
 const categoryService = new CategoryService();
 const storeConfigService = new StoreConfigService();
 
-const sectionWithProductsArgs = {
+const sectionWithCategoriesArgs = {
     include: {
         categories: true,
-        products: {
-            include: {
-                product: true,
-            },
-        },
     },
 } satisfies Prisma.SectionDefaultArgs;
 
-const categoryWithSectionsArgs = {
-    include: {
-        sections: {
-            include: {
-                section: {
-                    include: {
-                        products: {
-                            include: {
-                                product: true,
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    },
-} satisfies Prisma.CategoryDefaultArgs;
+type SectionWithCategories = Prisma.SectionGetPayload<
+    typeof sectionWithCategoriesArgs
+>;
 
-type SectionWithProducts = Prisma.SectionGetPayload<
-    typeof sectionWithProductsArgs
->;
-type CategoryWithSections = Prisma.CategoryGetPayload<
-    typeof categoryWithSectionsArgs
->;
-type ProductSectionItem = SectionWithProducts["products"][number];
-type CategorySectionItem = CategoryWithSections["sections"][number];
 type ProductEntity = {
     id: string;
     name: string;
@@ -140,29 +113,9 @@ export const getPublicCategories = async (): Promise<PublicCategory[]> => {
     }
 };
 
-const mapProductSectionToPublicProduct = (
-    productSection: ProductSectionItem,
-    sectionName: string,
-): PublicProduct | null => {
-    const { product } = productSection;
-    if (!product.isActive) {
-        return null;
-    }
-
-    return {
-        id: product.id,
-        name: product.name,
-        priceInCents: product.price,
-        discountPercentage: product.discountPercentage,
-        stock: product.stock,
-        image: product.image ?? "/logo.jpg",
-        description: sectionName,
-    };
-};
-
 const mapProductToPublicProduct = (
     product: ProductEntity,
-    sectionName: string,
+    context: string,
 ): PublicProduct | null => {
     if (!product.isActive) {
         return null;
@@ -175,13 +128,13 @@ const mapProductToPublicProduct = (
         discountPercentage: product.discountPercentage,
         stock: product.stock,
         image: product.image ?? "/logo.jpg",
-        description: sectionName,
+        description: context,
     };
 };
 
-const getSectionProductsByCategories = async (
+const getProductsByCategoryIds = async (
     categoryIds: string[],
-    sectionName: string,
+    context: string,
 ): Promise<PublicProduct[]> => {
     if (categoryIds.length === 0) {
         return [];
@@ -190,16 +143,10 @@ const getSectionProductsByCategories = async (
     const products = await getPrismaClient().product.findMany({
         where: {
             isActive: true,
-            sections: {
+            categories: {
                 some: {
-                    section: {
-                        categories: {
-                            some: {
-                                categoryId: {
-                                    in: categoryIds,
-                                },
-                            },
-                        },
+                    categoryId: {
+                        in: categoryIds,
                     },
                 },
             },
@@ -208,103 +155,47 @@ const getSectionProductsByCategories = async (
     });
 
     return products
-        .map((product: ProductEntity) =>
-            mapProductToPublicProduct(product, sectionName),
-        )
-        .filter((product): product is PublicProduct => product !== null);
-};
-
-const getSectionProducts = async (
-    section: SectionWithProducts,
-): Promise<PublicProduct[]> => {
-    const categoryIds = section.categories.map((relation) => relation.categoryId);
-    if (categoryIds.length > 0) {
-        return getSectionProductsByCategories(categoryIds, section.name);
-    }
-
-    return section.products
-        .map((productSection) =>
-            mapProductSectionToPublicProduct(productSection, section.name),
-        )
+        .map((product) => mapProductToPublicProduct(product, context))
         .filter((product): product is PublicProduct => product !== null);
 };
 
 const mapSectionToPublicSection = async (
-    section: SectionWithProducts,
-): Promise<PublicSection> => ({
-    id: section.id,
-    name: section.name,
-    description: section.isBanner
-        ? "Banner promocional configurado no painel administrativo."
-        : "Produtos selecionados para esta seção.",
-    isBanner: section.isBanner,
-    bannerImage: section.bannerImg,
-    products: await getSectionProducts(section),
-});
+    section: SectionWithCategories,
+): Promise<PublicSection> => {
+    const categoryIds = section.categories.map((relation) => relation.categoryId);
+
+    return {
+        id: section.id,
+        name: section.name,
+        description: section.isBanner
+            ? "Banner promocional configurado no painel administrativo."
+            : "Produtos selecionados para esta seção.",
+        isBanner: section.isBanner,
+        bannerImage: section.bannerImg,
+        products: await getProductsByCategoryIds(categoryIds, section.name),
+    };
+};
 
 export const getCategoryProducts = async (
     categoryId: string,
 ): Promise<PublicProduct[]> => {
     try {
-        const sections = await getPrismaClient().section.findMany({
-            where: {
-                isActive: true,
-                categories: {
-                    some: {
-                        categoryId,
-                    },
-                },
-            },
-            include: {
-                products: {
-                    include: {
-                        product: true,
-                    },
-                },
-            },
-            orderBy: [{ order: "asc" }, { name: "asc" }],
-        });
-
-        const productsMap = new Map<string, PublicProduct>();
-
-        sections.forEach((section) => {
-            section.products.forEach((productSection) => {
-                const product = mapProductSectionToPublicProduct(
-                    productSection,
-                    section.name,
-                );
-                if (!product) return;
-
-                productsMap.set(product.id, product);
-            });
-        });
-
-        const products = [...productsMap.values()].sort((a, b) =>
-            a.name.localeCompare(b.name),
-        );
-
-        if (products.length > 0) {
-            return products;
-        }
+        return await getProductsByCategoryIds([categoryId], "Categoria");
     } catch {
-        // Ignore and return empty list below.
+        return [];
     }
-
-    return [];
 };
 
 export const getHomeSections = async (): Promise<PublicSection[]> => {
     try {
-        const sections: SectionWithProducts[] =
+        const sections: SectionWithCategories[] =
             await getPrismaClient().section.findMany({
                 where: { isActive: true },
-                ...sectionWithProductsArgs,
+                ...sectionWithCategoriesArgs,
                 orderBy: [{ order: "asc" }, { name: "asc" }],
             });
 
-        return Promise.all(
-            sections.map((section) => mapSectionToPublicSection(section)),
-        );
+        return Promise.all(sections.map((section) => mapSectionToPublicSection(section)));
     } catch {
         return [];
     }
@@ -314,20 +205,20 @@ export const getSectionById = async (
     sectionId: string,
 ): Promise<PublicSection | null> => {
     try {
-        const section: SectionWithProducts | null =
+        const section: SectionWithCategories | null =
             await getPrismaClient().section.findFirst({
                 where: {
                     id: sectionId,
                     isActive: true,
                 },
-                ...sectionWithProductsArgs,
+                ...sectionWithCategoriesArgs,
             });
 
         if (!section) {
             return null;
         }
 
-        return await mapSectionToPublicSection(section);
+        return mapSectionToPublicSection(section);
     } catch {
         return null;
     }
@@ -337,37 +228,21 @@ export const getCategoryById = async (
     categoryId: string,
 ): Promise<PublicCategoryDetails | null> => {
     try {
-        const category: CategoryWithSections | null = await getPrismaClient().category.findFirst({
+        const category = await getPrismaClient().category.findFirst({
             where: {
                 id: categoryId,
                 isActive: true,
             },
-            ...categoryWithSectionsArgs,
         });
 
         if (!category) {
             return null;
         }
 
-        const productsMap = new Map<string, PublicProduct>();
-
-        category.sections.forEach(({ section }: CategorySectionItem) => {
-            section.products.forEach((productSection) => {
-                const product = mapProductSectionToPublicProduct(
-                    productSection,
-                    section.name,
-                );
-                if (!product) return;
-                productsMap.set(product.id, product);
-            });
-        });
-
         return {
             id: category.id,
             name: category.name,
-            products: [...productsMap.values()].sort((a, b) =>
-                a.name.localeCompare(b.name),
-            ),
+            products: await getCategoryProducts(category.id),
         };
     } catch {
         return null;
