@@ -30,6 +30,7 @@ const initialForm: StoreConfigFormData = {
 export function useAdminSettingsPage() {
     const [form, setForm] = useState<StoreConfigFormData>(initialForm);
     const [updatedAt, setUpdatedAt] = useState<string>("");
+    const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -50,15 +51,19 @@ export function useAdminSettingsPage() {
             setUpdatedAt(config.updatedAt);
         };
 
-        loadData().catch((error) => {
-            handlePageError({
-                error,
-                showToast,
-                toastMessage: "Falha ao carregar configurações.",
-                fallbackMessage: "Falha ao carregar configurações.",
-                setErrorMessage,
+        loadData()
+            .catch((error) => {
+                handlePageError({
+                    error,
+                    showToast,
+                    toastMessage: "Falha ao carregar configurações.",
+                    fallbackMessage: "Falha ao carregar configurações.",
+                    setErrorMessage,
+                });
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
-        });
     }, [showToast]);
 
     const onChangeField = (field: keyof StoreConfigFormData, value: string) => {
@@ -102,6 +107,7 @@ export function useAdminSettingsPage() {
     return {
         form,
         updatedAt,
+        isLoading,
         isSubmitting,
         errorMessage,
         successMessage,

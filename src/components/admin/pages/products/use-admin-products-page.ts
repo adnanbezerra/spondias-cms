@@ -22,6 +22,7 @@ import {
 export function useAdminProductsPage() {
     const [products, setProducts] = useState<AdminProduct[]>([]);
     const [categories, setCategories] = useState<AdminCategory[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [form, setForm] = useState<ProductForm>(initialProductForm);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
@@ -48,15 +49,19 @@ export function useAdminProductsPage() {
     }, []);
 
     useEffect(() => {
-        loadData().catch((error) => {
-            handlePageError({
-                error,
-                showToast,
-                toastMessage: "Falha ao carregar dados de produtos.",
-                fallbackMessage: "Falha ao carregar dados de produtos.",
-                setErrorMessage,
+        loadData()
+            .catch((error) => {
+                handlePageError({
+                    error,
+                    showToast,
+                    toastMessage: "Falha ao carregar dados de produtos.",
+                    fallbackMessage: "Falha ao carregar dados de produtos.",
+                    setErrorMessage,
+                });
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
-        });
     }, [loadData, showToast]);
 
     const resetForm = () => {
@@ -202,6 +207,7 @@ export function useAdminProductsPage() {
         currentImageUrl,
         editingProductId,
         isDialogOpen,
+        isLoading,
         isSubmitting,
         errorMessage,
         categoryMap,

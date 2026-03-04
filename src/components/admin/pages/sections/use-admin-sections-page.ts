@@ -23,6 +23,7 @@ import {
 export function useAdminSectionsPage() {
     const [sections, setSections] = useState<AdminSection[]>([]);
     const [categories, setCategories] = useState<AdminCategory[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [sectionCategories, setSectionCategories] =
         useState<SectionCategoriesMap>({});
     const [selectedPreviewSectionId, setSelectedPreviewSectionId] =
@@ -89,15 +90,19 @@ export function useAdminSectionsPage() {
     }, [selectedPreviewSectionId]);
 
     useEffect(() => {
-        loadData().catch((error) => {
-            handlePageError({
-                error,
-                showToast,
-                toastMessage: "Falha ao carregar seções.",
-                fallbackMessage: "Falha ao carregar dados de seções.",
-                setErrorMessage,
+        loadData()
+            .catch((error) => {
+                handlePageError({
+                    error,
+                    showToast,
+                    toastMessage: "Falha ao carregar seções.",
+                    fallbackMessage: "Falha ao carregar dados de seções.",
+                    setErrorMessage,
+                });
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
-        });
     }, [loadData, showToast]);
 
     const resetForm = () => {
@@ -306,6 +311,7 @@ export function useAdminSectionsPage() {
         currentBannerImg,
         selectedCategoryIds,
         form,
+        isLoading,
         isSubmitting,
         errorMessage,
         sortedSections,

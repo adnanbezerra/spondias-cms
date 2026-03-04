@@ -25,6 +25,7 @@ export function useAdminDashboardPage() {
     const [categories, setCategories] = useState<AdminCategory[]>([]);
     const [products, setProducts] = useState<AdminProduct[]>([]);
     const [sections, setSections] = useState<AdminSection[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [categoryForm, setCategoryForm] =
         useState<CategoryForm>(initialCategoryForm);
     const [productForm, setProductForm] =
@@ -51,14 +52,18 @@ export function useAdminDashboardPage() {
     }, []);
 
     useEffect(() => {
-        loadData().catch((error) => {
-            handlePageError({
-                error,
-                showToast,
-                toastMessage: "Falha ao carregar o dashboard.",
-                fallbackMessage: "Falha ao carregar o dashboard.",
+        loadData()
+            .catch((error) => {
+                handlePageError({
+                    error,
+                    showToast,
+                    toastMessage: "Falha ao carregar o dashboard.",
+                    fallbackMessage: "Falha ao carregar o dashboard.",
+                });
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
-        });
     }, [loadData, showToast]);
 
     const onSubmitCategory = async (
@@ -145,6 +150,7 @@ export function useAdminDashboardPage() {
         categories,
         products,
         sections,
+        isLoading,
         categoryForm,
         productForm,
         selectedCategoryIds,

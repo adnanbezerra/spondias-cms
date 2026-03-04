@@ -18,6 +18,7 @@ import {
 
 export function useAdminCategoriesPage() {
     const [categories, setCategories] = useState<AdminCategory[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [form, setForm] = useState<CategoryForm>(initialCategoryForm);
     const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
         null,
@@ -33,15 +34,19 @@ export function useAdminCategoriesPage() {
     }, []);
 
     useEffect(() => {
-        loadData().catch((error) => {
-            handlePageError({
-                error,
-                showToast,
-                toastMessage: "Falha ao carregar categorias.",
-                fallbackMessage: "Falha ao carregar categorias.",
-                setErrorMessage,
+        loadData()
+            .catch((error) => {
+                handlePageError({
+                    error,
+                    showToast,
+                    toastMessage: "Falha ao carregar categorias.",
+                    fallbackMessage: "Falha ao carregar categorias.",
+                    setErrorMessage,
+                });
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
-        });
     }, [loadData, showToast]);
 
     const resetForm = () => {
@@ -159,6 +164,7 @@ export function useAdminCategoriesPage() {
         form,
         editingCategoryId,
         isDialogOpen,
+        isLoading,
         isSubmitting,
         errorMessage,
         setForm,
