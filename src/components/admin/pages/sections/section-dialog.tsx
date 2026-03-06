@@ -163,6 +163,9 @@ export function SectionDialog({
                                 <label className="text-sm font-medium">
                                     Imagem de banner
                                 </label>
+                                <p className="text-xs text-[#334D40]/75">
+                                    Dimensão recomendada: 1200 x 320 px (proporção aproximada 3.75:1).
+                                </p>
                                 <input
                                     ref={fileInputRef}
                                     type="file"

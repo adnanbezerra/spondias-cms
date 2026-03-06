@@ -32,23 +32,28 @@ export function HomeSections({ sections }: HomeSectionsProps) {
     return (
         <section className="mx-auto w-full max-w-6xl space-y-8 px-4 pb-16 sm:px-6">
             {sections.map((section) => (
-                <article key={section.id} className="space-y-4">
-                    <header className="space-y-2">
-                        <h2 className="text-3xl font-semibold [font-family:var(--font-title)]">
-                            <Link
-                                href={`/secao/${section.id}`}
-                                className="hover:underline"
-                            >
-                                {section.name}
-                            </Link>
-                        </h2>
-                        <p className="text-sm text-[#334D40]/80">
-                            {section.description}
-                        </p>
-                    </header>
+                <article
+                    key={section.id}
+                    className={section.isBanner ? "" : "space-y-4"}
+                >
+                    {!section.isBanner ? (
+                        <header className="space-y-2">
+                            <h2 className="text-3xl font-semibold [font-family:var(--font-title)]">
+                                <Link
+                                    href={`/secao/${section.id}`}
+                                    className="hover:underline"
+                                >
+                                    {section.name}
+                                </Link>
+                            </h2>
+                            <p className="text-sm text-[#334D40]/80">
+                                {section.description}
+                            </p>
+                        </header>
+                    ) : null}
 
                     {section.isBanner ? (
-                        <div className="overflow-hidden rounded-3xl border border-[#334D40]/15 bg-white/70 p-3 shadow-sm">
+                        <div className="overflow-hidden rounded-3xl border border-[#334D40]/15 bg-white/70 shadow-sm">
                             <Image
                                 src={section.bannerImage ?? "/logo.jpg"}
                                 alt={section.name}
