@@ -63,6 +63,7 @@ const seedSections = [
             {
                 id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
                 name: "Jiboia Limão",
+                description: "Folhagem pendente de fácil cuidado, ideal para meia-sombra.",
                 price: 4590,
                 discountPercentage: 10,
                 stock: 12,
@@ -72,6 +73,7 @@ const seedSections = [
             {
                 id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
                 name: "Zamioculca",
+                description: "Planta resistente, perfeita para interiores e baixa manutenção.",
                 price: 6990,
                 discountPercentage: 0,
                 stock: 7,
@@ -100,6 +102,7 @@ const seedSections = [
             {
                 id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3",
                 name: "Hera Inglesa",
+                description: "Excelente opção para vasos suspensos com aspecto ornamental.",
                 price: 3290,
                 discountPercentage: 5,
                 stock: 21,
@@ -109,6 +112,7 @@ const seedSections = [
             {
                 id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4",
                 name: "Colar de Pérolas",
+                description: "Suculenta pendente com visual delicado e ótimo destaque decorativo.",
                 price: 5490,
                 discountPercentage: 15,
                 stock: 9,
@@ -206,6 +210,7 @@ const seed = async () => {
         .map((product) => ({
             id: product.id,
             name: product.name,
+            description: product.description,
             price: product.price,
             discountPercentage: product.discountPercentage,
             stock: product.stock,
