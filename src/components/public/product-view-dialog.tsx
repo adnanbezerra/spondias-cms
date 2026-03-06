@@ -24,10 +24,17 @@ type ProductViewContentProps = {
 
 export function ProductViewContent({ details, shareUrl }: ProductViewContentProps) {
     const { addToCart } = useCart();
+    const relatedProducts = Array.from(
+        new Map(
+            details.relatedByCategory
+                .flatMap((group) => group.products)
+                .map((product) => [product.id, product]),
+        ).values(),
+    );
 
     return (
-        <div className="grid gap-4 p-4 md:grid-cols-[1fr,320px]">
-            <div className="space-y-3">
+        <div className="flex flex-col gap-4 p-4 lg:flex-row">
+            <div className="min-w-0 flex-1 space-y-3">
                 <Image
                     src={details.product.image}
                     alt={details.product.name}
@@ -43,9 +50,25 @@ export function ProductViewContent({ details, shareUrl }: ProductViewContentProp
                     <button
                         type="button"
                         onClick={() => navigator.clipboard.writeText(shareUrl)}
-                        className="rounded-xl border border-[#334D40]/20 px-4 py-2 text-sm"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#334D40]/20 text-[#334D40] transition hover:bg-[#334D40] hover:text-[#DBD7CB]"
+                        aria-label="Copiar link para compartilhar"
+                        title="Copiar link para compartilhar"
                     >
-                        Copiar link para compartilhar
+                        <svg
+                            viewBox="0 0 24 24"
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path d="M8 7.5V6A3 3 0 0 1 11 3h2a3 3 0 0 1 3 3v1.5" />
+                            <rect x="7" y="7.5" width="10" height="13.5" rx="2" />
+                            <path d="M10 12h4" />
+                            <path d="M10 16h4" />
+                        </svg>
                     </button>
                     <button
                         type="button"
@@ -57,23 +80,35 @@ export function ProductViewContent({ details, shareUrl }: ProductViewContentProp
                 </div>
             </div>
 
-            <aside className="space-y-3 rounded-2xl border border-[#334D40]/15 bg-[#F8F7F3] p-3">
+            <aside className="w-full space-y-3 rounded-2xl border border-[#334D40]/15 bg-[#F8F7F3] p-3 lg:w-[320px] lg:shrink-0">
                 <p className="text-sm font-semibold">Produtos da mesma categoria</p>
-                {details.relatedByCategory.length === 0 ? (
+                {relatedProducts.length === 0 ? (
                     <p className="text-xs text-[#334D40]/70">Sem produtos relacionados.</p>
                 ) : (
-                    details.relatedByCategory.map((group) => (
-                        <div key={group.categoryId} className="space-y-2">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-[#334D40]/80">{group.categoryName}</p>
-                            <div className="space-y-2">
-                                {group.products.map((product) => (
-                                    <a key={product.id} href={`/produto/${product.id}`} className="block rounded-xl border border-[#334D40]/10 bg-white p-2 text-xs">
-                                        {product.name}
-                                    </a>
-                                ))}
-                            </div>
-                        </div>
-                    ))
+                    <div className="space-y-2">
+                        {relatedProducts.map((product) => (
+                            <a
+                                key={product.id}
+                                href={`/produto/${product.id}`}
+                                className="flex items-center gap-2 rounded-xl border border-[#334D40]/10 bg-white p-2 text-xs"
+                            >
+                                <Image
+                                    src={product.image}
+                                    alt={product.name}
+                                    width={64}
+                                    height={64}
+                                    className="h-14 w-14 rounded-lg object-cover"
+                                />
+                                <div className="min-w-0">
+                                    <p className="truncate font-semibold">{product.name}</p>
+                                    <p className="text-[#334D40]/70">{formatBRL(product.priceInCents)}</p>
+                                    <p className="truncate text-[#334D40]/70">
+                                        {product.categoryNames.join(" • ")}
+                                    </p>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
                 )}
             </aside>
         </div>

@@ -60,6 +60,11 @@ export function CartProvider({ children, whatsappNumber }: CartProviderProps) {
     const [items, setItems] = useState<CartItem[]>(getInitialItems);
 
     useEffect(() => {
+        if (items.length === 0) {
+            window.localStorage.removeItem(CART_STORAGE_KEY);
+            return;
+        }
+
         window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
     }, [items]);
 

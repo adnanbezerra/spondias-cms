@@ -14,7 +14,8 @@ const formatBRL = (valueInCents: number) => new Intl.NumberFormat("pt-BR", { sty
 
 export const SiteHeader = ({ categories }: SiteHeaderProps) => {
     const [cartOpen, setCartOpen] = useState(false);
-    const { items, totalItems, removeFromCart, whatsappCheckoutUrl } = useCart();
+    const { items, totalItems, removeFromCart, clearCart, whatsappCheckoutUrl } =
+        useCart();
 
     return (
         <header className="sticky top-0 z-30 border-b border-[#334D40]/15 bg-[#DBD7CB]/95 backdrop-blur-md">
@@ -80,16 +81,25 @@ export const SiteHeader = ({ categories }: SiteHeaderProps) => {
                                     <>
                                         <div className="mt-3 max-h-64 space-y-2 overflow-auto">
                                             {items.map((item) => (
-                                                <div key={item.product.id} className="rounded-xl border border-[#334D40]/15 p-2 text-xs">
-                                                    <p className="font-semibold">{item.product.name} {item.quantity > 1 ? `x${item.quantity}` : ""}</p>
-                                                    <p>{formatBRL(item.product.priceInCents)}</p>
-                                                    <button
-                                                        type="button"
-                                                        className="mt-1 text-red-700"
-                                                        onClick={() => removeFromCart(item.product.id)}
-                                                    >
-                                                        Remover
-                                                    </button>
+                                                <div key={item.product.id} className="flex gap-2 rounded-xl border border-[#334D40]/15 p-2 text-xs">
+                                                    <Image
+                                                        src={item.product.image}
+                                                        alt={item.product.name}
+                                                        width={56}
+                                                        height={56}
+                                                        className="h-14 w-14 rounded-lg object-cover"
+                                                    />
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="truncate font-semibold">{item.product.name} {item.quantity > 1 ? `x${item.quantity}` : ""}</p>
+                                                        <p>{formatBRL(item.product.priceInCents)}</p>
+                                                        <button
+                                                            type="button"
+                                                            className="mt-1 text-red-700"
+                                                            onClick={() => removeFromCart(item.product.id)}
+                                                        >
+                                                            Remover
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -97,6 +107,10 @@ export const SiteHeader = ({ categories }: SiteHeaderProps) => {
                                             href={whatsappCheckoutUrl}
                                             target="_blank"
                                             rel="noreferrer"
+                                            onClick={() => {
+                                                clearCart();
+                                                setCartOpen(false);
+                                            }}
                                             className="mt-3 block rounded-xl bg-[#334D40] px-3 py-2 text-center text-sm font-semibold text-[#DBD7CB]"
                                         >
                                             Fechar compra no WhatsApp
