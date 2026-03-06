@@ -40,6 +40,7 @@ export default function AdminSectionsPage() {
         isDialogOpen,
         editingSectionId,
         currentBannerImg,
+        bannerFile,
         selectedCategoryIds,
         form,
         isLoading,
@@ -99,6 +100,7 @@ export default function AdminSectionsPage() {
                                 onToggleCategory={onToggleCategory}
                                 onToggleBanner={onToggleBanner}
                                 onBannerFileChange={setBannerFile}
+                                selectedBannerFile={bannerFile}
                                 currentBannerImg={currentBannerImg}
                                 isSubmitting={isSubmitting}
                             />

@@ -309,6 +309,7 @@ export function useAdminSectionsPage() {
         isDialogOpen,
         editingSectionId,
         currentBannerImg,
+        bannerFile,
         selectedCategoryIds,
         form,
         isLoading,

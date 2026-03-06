@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { AdminCategory } from "@/src/components/admin/admin-api";
 import {
     Dialog,
@@ -28,6 +29,7 @@ type SectionDialogProps = {
     onToggleCategory: (categoryId: string) => void;
     onToggleBanner: (isBanner: boolean) => void;
     onBannerFileChange: (file: File | null) => void;
+    selectedBannerFile: File | null;
     currentBannerImg: string | null;
     isSubmitting: boolean;
 };
@@ -46,9 +48,34 @@ export function SectionDialog({
     onToggleCategory,
     onToggleBanner,
     onBannerFileChange,
+    selectedBannerFile,
     currentBannerImg,
     isSubmitting,
 }: SectionDialogProps) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedBannerPreviewUrl, setSelectedBannerPreviewUrl] = useState<
+        string | null
+    >(null);
+
+    useEffect(() => {
+        if (!selectedBannerFile) {
+            setSelectedBannerPreviewUrl(null);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(selectedBannerFile);
+        setSelectedBannerPreviewUrl(objectUrl);
+
+        return () => {
+            URL.revokeObjectURL(objectUrl);
+        };
+    }, [selectedBannerFile]);
+
+    const previewBannerUrl = selectedBannerPreviewUrl ?? currentBannerImg;
+    const openFilePicker = () => {
+        fileInputRef.current?.click();
+    };
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
@@ -132,11 +159,12 @@ export function SectionDialog({
                         </label>
 
                         {form.isBanner ? (
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <label className="text-sm font-medium">
                                     Imagem de banner
                                 </label>
                                 <input
+                                    ref={fileInputRef}
                                     type="file"
                                     accept="image/jpeg,image/png,image/webp"
                                     onChange={(event) =>
@@ -144,11 +172,71 @@ export function SectionDialog({
                                             event.target.files?.item(0) ?? null,
                                         )
                                     }
-                                    className="w-full rounded-xl border border-[#334D40]/20 px-3 py-2"
+                                    className="hidden"
                                 />
-                                {currentBannerImg ? (
-                                    <p className="break-all text-xs text-[#334D40]/70">
-                                        Imagem atual: {currentBannerImg}
+
+                                <div
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={openFilePicker}
+                                    onKeyDown={(event) => {
+                                        if (
+                                            event.key === "Enter" ||
+                                            event.key === " "
+                                        ) {
+                                            event.preventDefault();
+                                            openFilePicker();
+                                        }
+                                    }}
+                                    className="group relative h-44 w-full cursor-pointer overflow-hidden rounded-2xl border border-dashed border-[#334D40]/30 bg-[#F8F7F3]"
+                                >
+                                    {previewBannerUrl ? (
+                                        <img
+                                            src={previewBannerUrl}
+                                            alt="Preview da imagem do banner"
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-[#334D40]/70">
+                                            Clique para enviar uma imagem de
+                                            banner (JPEG, PNG ou WEBP)
+                                        </div>
+                                    )}
+
+                                    <div className="pointer-events-none absolute inset-0 bg-[#0B1711]/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                                        <div className="flex h-full items-center justify-center text-sm font-semibold text-white">
+                                            Editar imagem
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={openFilePicker}
+                                        className="rounded-lg border border-[#334D40]/20 px-3 py-1.5 text-xs font-medium text-[#334D40]"
+                                    >
+                                        {previewBannerUrl
+                                            ? "Trocar imagem"
+                                            : "Selecionar imagem"}
+                                    </button>
+                                    {previewBannerUrl ? (
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                onBannerFileChange(null)
+                                            }
+                                            className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700"
+                                        >
+                                            Remover imagem
+                                        </button>
+                                    ) : null}
+                                </div>
+
+                                {selectedBannerFile ? (
+                                    <p className="text-xs text-[#334D40]/75">
+                                        Arquivo selecionado:{" "}
+                                        {selectedBannerFile.name}
                                     </p>
                                 ) : null}
                             </div>
