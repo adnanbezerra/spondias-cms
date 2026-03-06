@@ -123,6 +123,22 @@ export const NewProductDialog = ({
                 />
             </div>
 
+
+            <div className="space-y-1">
+                <label className="text-sm font-medium">Descrição</label>
+                <textarea
+                    value={form.description}
+                    onChange={(event) =>
+                        onChange({
+                            ...form,
+                            description: event.target.value,
+                        })
+                    }
+                    className="min-h-32 w-full rounded-xl border border-[#334D40]/20 px-3 py-2"
+                    placeholder="Descreva detalhes do produto, cuidados, tamanhos e observações."
+                />
+            </div>
+
             <div className="grid gap-3 sm:grid-cols-3">
                 <div className="space-y-1">
                     <label className="text-sm font-medium">Preço</label>

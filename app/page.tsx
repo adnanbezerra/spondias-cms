@@ -21,10 +21,7 @@ export default async function Home() {
         <main className="min-h-screen text-[#334D40]">
             <SiteHeader categories={categories} />
             <HomeHero config={config} categories={categories} />
-            <HomeSections
-                sections={sections}
-                whatsappNumber={config.whatsappNumber}
-            />
+            <HomeSections sections={sections} />
             <SiteFooter config={config} />
         </main>
     );

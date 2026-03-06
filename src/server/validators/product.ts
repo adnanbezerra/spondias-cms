@@ -7,6 +7,7 @@ const imageReferenceSchema = z.string().refine(
 
 export const productCreateInputSchema = z.object({
     name: z.string().min(2),
+    description: z.string().max(10000).optional().default(""),
     price: z.number().int().nonnegative(),
     stock: z.number().int().nonnegative(),
     discountPercentage: z.number().int().min(0).max(100).optional().default(0),
@@ -17,6 +18,7 @@ export const productCreateInputSchema = z.object({
 
 export const productUpdateInputSchema = z.object({
     name: z.string().min(2).optional(),
+    description: z.string().max(10000).optional(),
     price: z.number().int().nonnegative().optional(),
     stock: z.number().int().nonnegative().optional(),
     discountPercentage: z.number().int().min(0).max(100).optional(),
@@ -32,6 +34,7 @@ export const productIdParamsSchema = z.object({
 export const productOutputSchema = z.object({
     id: z.uuid(),
     name: z.string(),
+    description: z.string(),
     price: z.number().int().nonnegative(),
     stock: z.number().int().nonnegative(),
     discountPercentage: z.number().int().min(0).max(100),

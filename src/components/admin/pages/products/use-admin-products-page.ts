@@ -85,6 +85,7 @@ export function useAdminProductsPage() {
             setEditingProductId(product.id);
             setForm({
                 name: product.name,
+                description: product.description,
                 price: product.price,
                 stock: product.stock,
                 discountPercentage: product.discountPercentage,

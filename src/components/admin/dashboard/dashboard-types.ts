@@ -5,6 +5,7 @@ export type CategoryForm = {
 
 export type ProductForm = {
     name: string;
+    description: string;
     price: number;
     stock: number;
     discountPercentage: number;
@@ -18,6 +19,7 @@ export const initialCategoryForm: CategoryForm = {
 
 export const initialProductForm: ProductForm = {
     name: "",
+    description: "",
     price: 0,
     stock: 0,
     discountPercentage: 0,

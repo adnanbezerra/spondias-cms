@@ -19,11 +19,13 @@ type SectionWithCategories = Prisma.SectionGetPayload<
 type ProductEntity = {
     id: string;
     name: string;
+    description: string;
     price: number;
     discountPercentage: number;
     stock: number;
     image: string | null;
     isActive: boolean;
+    categories: Array<{ categoryId: string; category: { name: string; isActive: boolean } }>;
 };
 
 export type PublicStoreConfig = {
@@ -47,6 +49,8 @@ export type PublicProduct = {
     stock: number;
     image: string;
     description: string;
+    categoryIds: string[];
+    categoryNames: string[];
 };
 
 export type PublicSection = {
@@ -62,6 +66,17 @@ export type PublicCategoryDetails = {
     id: string;
     name: string;
     products: PublicProduct[];
+};
+
+export type PublicRelatedProductsByCategory = {
+    categoryId: string;
+    categoryName: string;
+    products: PublicProduct[];
+};
+
+export type PublicProductDetails = {
+    product: PublicProduct;
+    relatedByCategory: PublicRelatedProductsByCategory[];
 };
 
 const emptyStoreConfig: PublicStoreConfig = {
@@ -113,13 +128,12 @@ export const getPublicCategories = async (): Promise<PublicCategory[]> => {
     }
 };
 
-const mapProductToPublicProduct = (
-    product: ProductEntity,
-    context: string,
-): PublicProduct | null => {
+const mapProductToPublicProduct = (product: ProductEntity): PublicProduct | null => {
     if (!product.isActive) {
         return null;
     }
+
+    const activeCategories = product.categories.filter((item) => item.category.isActive);
 
     return {
         id: product.id,
@@ -128,13 +142,32 @@ const mapProductToPublicProduct = (
         discountPercentage: product.discountPercentage,
         stock: product.stock,
         image: product.image ?? "/logo.jpg",
-        description: context,
+        description: product.description,
+        categoryIds: activeCategories.map((item) => item.categoryId),
+        categoryNames: activeCategories.map((item) => item.category.name),
     };
 };
 
+const productIncludeArgs = {
+    include: {
+        categories: {
+            include: {
+                category: {
+                    select: {
+                        name: true,
+                        isActive: true,
+                    },
+                },
+            },
+            orderBy: {
+                categoryId: "asc",
+            },
+        },
+    },
+} satisfies Prisma.ProductDefaultArgs;
+
 const getProductsByCategoryIds = async (
     categoryIds: string[],
-    context: string,
 ): Promise<PublicProduct[]> => {
     if (categoryIds.length === 0) {
         return [];
@@ -151,11 +184,12 @@ const getProductsByCategoryIds = async (
                 },
             },
         },
+        ...productIncludeArgs,
         orderBy: [{ name: "asc" }, { createdAt: "desc" }],
     });
 
     return products
-        .map((product) => mapProductToPublicProduct(product, context))
+        .map((product) => mapProductToPublicProduct(product))
         .filter((product): product is PublicProduct => product !== null);
 };
 
@@ -172,7 +206,7 @@ const mapSectionToPublicSection = async (
             : "Produtos selecionados para esta seção.",
         isBanner: section.isBanner,
         bannerImage: section.bannerImg,
-        products: await getProductsByCategoryIds(categoryIds, section.name),
+        products: await getProductsByCategoryIds(categoryIds),
     };
 };
 
@@ -180,7 +214,7 @@ export const getCategoryProducts = async (
     categoryId: string,
 ): Promise<PublicProduct[]> => {
     try {
-        return await getProductsByCategoryIds([categoryId], "Categoria");
+        return await getProductsByCategoryIds([categoryId]);
     } catch {
         return [];
     }
@@ -243,6 +277,66 @@ export const getCategoryById = async (
             id: category.id,
             name: category.name,
             products: await getCategoryProducts(category.id),
+        };
+    } catch {
+        return null;
+    }
+};
+
+export const getPublicProductDetailsById = async (
+    productId: string,
+): Promise<PublicProductDetails | null> => {
+    try {
+        const product = await getPrismaClient().product.findFirst({
+            where: {
+                id: productId,
+                isActive: true,
+            },
+            ...productIncludeArgs,
+        });
+
+        if (!product) {
+            return null;
+        }
+
+        const publicProduct = mapProductToPublicProduct(product);
+        if (!publicProduct) {
+            return null;
+        }
+
+        const relatedByCategory: PublicRelatedProductsByCategory[] = [];
+        for (const relation of product.categories) {
+            if (!relation.category.isActive) {
+                continue;
+            }
+
+            const sameCategoryProducts = await getPrismaClient().product.findMany({
+                where: {
+                    id: { not: product.id },
+                    isActive: true,
+                    categories: {
+                        some: {
+                            categoryId: relation.categoryId,
+                        },
+                    },
+                },
+                ...productIncludeArgs,
+                orderBy: [{ name: "asc" }],
+                take: 8,
+            });
+
+            relatedByCategory.push({
+                categoryId: relation.categoryId,
+                categoryName: relation.category.name,
+                products: sameCategoryProducts
+                    .map((item) => mapProductToPublicProduct(item))
+                    .filter((item): item is PublicProduct => item !== null),
+            });
+        }
+
+        return {
+            product: publicProduct,
+            relatedByCategory,
         };
     } catch {
         return null;

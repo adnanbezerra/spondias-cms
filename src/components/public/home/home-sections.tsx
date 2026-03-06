@@ -1,17 +1,34 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import { ProductCard } from "@/src/components/public/product-card";
+import { ProductViewDialog } from "@/src/components/public/product-view-dialog";
+import { useCart } from "@/src/components/public/cart-context";
 import type {
     PublicSection,
-    PublicStoreConfig,
+    PublicProductDetails,
 } from "@/src/server/public/public-content";
 
 type HomeSectionsProps = {
     sections: PublicSection[];
-    whatsappNumber: PublicStoreConfig["whatsappNumber"];
 };
 
-export function HomeSections({ sections, whatsappNumber }: HomeSectionsProps) {
+export function HomeSections({ sections }: HomeSectionsProps) {
+    const [selectedProduct, setSelectedProduct] = useState<PublicProductDetails | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const { addToCart } = useCart();
+
+    const openProduct = async (productId: string) => {
+        const response = await fetch(`/api/public/products/${productId}`);
+        if (!response.ok) return;
+
+        const payload = (await response.json()) as PublicProductDetails;
+        setSelectedProduct(payload);
+        setIsDialogOpen(true);
+    };
+
     return (
         <section className="mx-auto w-full max-w-6xl space-y-8 px-4 pb-16 sm:px-6">
             {sections.map((section) => (
@@ -48,14 +65,23 @@ export function HomeSections({ sections, whatsappNumber }: HomeSectionsProps) {
                                 <ProductCard
                                     key={product.id}
                                     product={product}
-                                    whatsappNumber={whatsappNumber}
                                     className="mr-4 min-w-[250px]"
+                                    onOpenProduct={openProduct}
+                                    onAddToCart={addToCart}
                                 />
                             ))}
                         </div>
                     ) : null}
                 </article>
             ))}
+
+            {selectedProduct ? (
+                <ProductViewDialog
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                    details={selectedProduct}
+                />
+            ) : null}
         </section>
     );
 }

@@ -1,4 +1,4 @@
-import { ProductCard } from "@/src/components/public/product-card";
+import { ProductsCatalogClient } from "@/src/components/public/catalog/products-catalog-client";
 import { SiteFooter } from "@/src/components/public/site-footer";
 import { SiteHeader } from "@/src/components/public/site-header";
 import type {
@@ -44,15 +44,7 @@ export function ProductsCatalogPage({
 
             <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
                 {products.length > 0 ? (
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {products.map((product) => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                whatsappNumber={config.whatsappNumber}
-                            />
-                        ))}
-                    </div>
+                    <ProductsCatalogClient products={products} />
                 ) : (
                     <div className="rounded-2xl border border-[#334D40]/15 bg-white/70 p-6">
                         <p className="text-sm text-[#334D40]/80">

@@ -20,6 +20,7 @@ export type AdminSection = {
 export type AdminProduct = {
     id: string;
     name: string;
+    description: string;
     price: number;
     stock: number;
     discountPercentage: number;

@@ -64,12 +64,12 @@ export function ProductsList({
                                     Categorias:{" "}
                                     {product.categoryIds.length > 0
                                         ? product.categoryIds
-                                              .map(
-                                                  (id) =>
-                                                      categoryMap.get(id) ??
+                                            .map(
+                                                (id) =>
+                                                    categoryMap.get(id) ??
                                                       "Categoria",
-                                              )
-                                              .join(", ")
+                                            )
+                                            .join(", ")
                                         : "Sem categoria"}
                                 </p>
                             </div>

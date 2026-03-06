@@ -12,6 +12,8 @@ export const publicProductOutputSchema = z.object({
     stock: z.number().int().nonnegative(),
     image: z.string(),
     description: z.string(),
+    categoryIds: z.array(z.uuid()),
+    categoryNames: z.array(z.string()),
 });
 
 export const publicCategoryOutputSchema = z.object({
@@ -24,6 +26,8 @@ export const publicSectionOutputSchema = z.object({
     id: z.uuid(),
     name: z.string(),
     description: z.string(),
+    categoryIds: z.array(z.uuid()),
+    categoryNames: z.array(z.string()),
     isBanner: z.boolean(),
     bannerImage: z.string().nullable(),
     products: z.array(publicProductOutputSchema),

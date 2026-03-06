@@ -3,6 +3,7 @@ import { getPrismaClient } from "@/src/server/db/prisma";
 export type ProductRecord = {
     id: string;
     name: string;
+    description: string;
     price: number;
     stock: number;
     discountPercentage: number;
@@ -16,6 +17,7 @@ export type ProductRecord = {
 type ProductRow = {
     id: string;
     name: string;
+    description: string;
     price: number;
     stock: number;
     discountPercentage: number;
@@ -29,6 +31,7 @@ type ProductRow = {
 const mapRowToRecord = (row: ProductRow): ProductRecord => ({
     id: row.id,
     name: row.name,
+    description: row.description,
     price: row.price,
     stock: row.stock,
     discountPercentage: row.discountPercentage,
@@ -45,6 +48,7 @@ export type ProductRepository = {
     findByName(name: string): Promise<ProductRecord | null>;
     create(data: {
         name: string;
+        description: string;
         price: number;
         stock: number;
         discountPercentage: number;
@@ -56,6 +60,7 @@ export type ProductRepository = {
         id: string,
         data: Partial<{
             name: string;
+            description: string;
             price: number;
             stock: number;
             discountPercentage: number;
@@ -122,6 +127,7 @@ export const prismaProductRepository: ProductRepository = {
         const row = await getPrismaClient().product.create({
             data: {
                 name: data.name,
+                description: data.description,
                 price: data.price,
                 stock: data.stock,
                 discountPercentage: data.discountPercentage,
@@ -158,6 +164,9 @@ export const prismaProductRepository: ProductRepository = {
             where: { id },
             data: {
                 ...(data.name !== undefined ? { name: data.name } : {}),
+                ...(data.description !== undefined
+                    ? { description: data.description }
+                    : {}),
                 ...(data.price !== undefined ? { price: data.price } : {}),
                 ...(data.stock !== undefined ? { stock: data.stock } : {}),
                 ...(data.discountPercentage !== undefined
