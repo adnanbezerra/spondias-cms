@@ -123,7 +123,6 @@ export const NewProductDialog = ({
                 />
             </div>
 
-
             <div className="space-y-1">
                 <label className="text-sm font-medium">Descrição</label>
                 <textarea

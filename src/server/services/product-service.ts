@@ -7,7 +7,11 @@ import {
     prismaCategoryRepository,
     type CategoryRepository,
 } from "@/src/server/repositories/category-repository";
-import { ConflictError, NotFoundError, ValidationError } from "@/src/server/shared/errors";
+import {
+    ConflictError,
+    NotFoundError,
+    ValidationError,
+} from "@/src/server/shared/errors";
 import { left, right, type Either } from "@/src/server/shared/either";
 import {
     productOutputSchema,
@@ -37,7 +41,9 @@ export class ProductService {
         return right(productOutputSchema.parse(product));
     }
 
-    async create(input: ProductCreateInput): Promise<Either<ProductError, ProductRecord>> {
+    async create(
+        input: ProductCreateInput,
+    ): Promise<Either<ProductError, ProductRecord>> {
         const found = await this.productRepository.findByName(input.name);
         if (found) {
             return left(new ConflictError("Produto já cadastrado."));
@@ -50,7 +56,9 @@ export class ProductService {
             ),
         );
         if (categories.some((category) => !category)) {
-            return left(new ValidationError("Uma ou mais categorias não existem."));
+            return left(
+                new ValidationError("Uma ou mais categorias não existem."),
+            );
         }
 
         const created = await this.productRepository.create({
@@ -67,9 +75,14 @@ export class ProductService {
         return right(productOutputSchema.parse(created));
     }
 
-    async update(id: string, input: ProductUpdateInput): Promise<Either<ProductError, ProductRecord>> {
+    async update(
+        id: string,
+        input: ProductUpdateInput,
+    ): Promise<Either<ProductError, ProductRecord>> {
         if (input.name) {
-            const foundByName = await this.productRepository.findByName(input.name);
+            const foundByName = await this.productRepository.findByName(
+                input.name,
+            );
             if (foundByName && foundByName.id !== id) {
                 return left(new ConflictError("Nome do produto já utilizado."));
             }
@@ -86,7 +99,9 @@ export class ProductService {
                 ),
             );
             if (categories.some((category) => !category)) {
-                return left(new ValidationError("Uma ou mais categorias não existem."));
+                return left(
+                    new ValidationError("Uma ou mais categorias não existem."),
+                );
             }
         }
 

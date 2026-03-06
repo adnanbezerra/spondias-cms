@@ -165,7 +165,7 @@ export function DialogContent({
     return (
         <DialogPortal>
             <div
-                className="fixed inset-0 z-50 grid place-items-center p-4"
+                className="fixed inset-0 z-50 grid place-items-center p-4 overflow-y-scroll"
                 onMouseDown={(event) => {
                     if (event.target === event.currentTarget) {
                         onOpenChange(false);
@@ -237,7 +237,7 @@ export function DialogFooter({
     return (
         <div
             className={cx(
-                "flex items-center justify-end gap-2 border-t border-[#334D40]/10 bg-[#F8F7F3] px-6 py-4",
+                "rounded-2xl flex items-center justify-end gap-2 border-t border-[#334D40]/10 bg-[#F8F7F3] px-6 py-4",
                 className,
             )}
             {...props}
