@@ -12,17 +12,29 @@ export type UserRecord = {
 };
 
 export type UserRepository = {
+    list(): Promise<UserRecord[]>;
+    findById(id: string): Promise<UserRecord | null>;
     findByEmail(email: string): Promise<UserRecord | null>;
     findByCpf(cpf: string): Promise<UserRecord | null>;
     findByEmailOrCpf(login: string): Promise<UserRecord | null>;
     create(
         data: Pick<UserRecord, "name" | "email" | "cpf" | "passwordHash">,
     ): Promise<UserRecord>;
+    update(
+        id: string,
+        data: Partial<Pick<UserRecord, "name" | "email" | "cpf" | "isActive">>,
+    ): Promise<UserRecord | null>;
 };
 
 const users = new Map<string, UserRecord>();
 
 export const inMemoryUserRepository: UserRepository = {
+    async list() {
+        return [...users.values()];
+    },
+    async findById(id) {
+        return users.get(id) ?? null;
+    },
     async findByEmail(email) {
         return [...users.values()].find((user) => user.email === email) ?? null;
     },
@@ -52,9 +64,38 @@ export const inMemoryUserRepository: UserRepository = {
         users.set(user.id, user);
         return user;
     },
+    async update(id, data) {
+        const found = users.get(id);
+        if (!found) {
+            return null;
+        }
+
+        const updated: UserRecord = {
+            ...found,
+            ...data,
+            updatedAt: new Date(),
+        };
+        users.set(id, updated);
+
+        return updated;
+    },
 };
 
 export const prismaUserRepository: UserRepository = {
+    async list() {
+        const users = await getPrismaClient().user.findMany({
+            orderBy: { createdAt: "desc" },
+        });
+
+        return users;
+    },
+    async findById(id) {
+        const user = await getPrismaClient().user.findUnique({
+            where: { id },
+        });
+
+        return user;
+    },
     async findByEmail(email) {
         const user = await getPrismaClient().user.findUnique({
             where: { email },
@@ -89,5 +130,17 @@ export const prismaUserRepository: UserRepository = {
         });
 
         return user;
+    },
+    async update(id, data) {
+        try {
+            const user = await getPrismaClient().user.update({
+                where: { id },
+                data,
+            });
+
+            return user;
+        } catch {
+            return null;
+        }
     },
 };

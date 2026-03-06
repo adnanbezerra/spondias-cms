@@ -38,6 +38,16 @@ export type AdminStoreConfig = {
     updatedAt: string;
 };
 
+export type AdminUser = {
+    id: string;
+    name: string;
+    email: string;
+    cpf: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+};
+
 type UploadImageResponse = {
     url: string;
     fileName: string;
