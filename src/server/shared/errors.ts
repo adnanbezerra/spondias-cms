@@ -38,3 +38,9 @@ export class TooManyRequestsError extends AppError {
         super(message, 429, "TOO_MANY_REQUESTS");
     }
 }
+
+export class DatabaseConnectionError extends AppError {
+    constructor(message: string) {
+        super(message, 503, "DATABASE_CONNECTION_ERROR");
+    }
+}

@@ -26,10 +26,10 @@ export const AdminSidebar = () => {
                 <div className="flex items-center justify-between gap-3">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#334D40]/70">
-                            Plant Store
+                            Spondias Jardinagem
                         </p>
                         <p className="text-sm font-semibold text-[#334D40]">
-                            CMS Admin
+                            Área do Administrador
                         </p>
                     </div>
                     <Link
@@ -62,10 +62,10 @@ export const AdminSidebar = () => {
             <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-[#334D40]/15 bg-[#F8F7F3] lg:flex lg:flex-col">
                 <div className="border-b border-[#334D40]/10 px-6 py-6">
                     <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#334D40]/70">
-                        Plant Store
+                        Spondias Jardinagem
                     </p>
                     <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-title)]">
-                        CMS Admin
+                        Administrador
                     </h1>
                 </div>
 

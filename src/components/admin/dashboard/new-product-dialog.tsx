@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { type AdminCategory } from "@/src/components/admin/admin-api";
 import { DashboardActionDialog } from "@/src/components/admin/dashboard/dashboard-action-dialog";
 import { type ProductForm } from "@/src/components/admin/dashboard/dashboard-types";
@@ -13,6 +14,7 @@ type NewProductDialogProps = {
     selectedCategoryIds: string[];
     onToggleCategory: (categoryId: string) => void;
     currentImageUrl?: string | null;
+    selectedImageFile?: File | null;
     onImageFileChange: (file: File | null) => void;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     isSubmitting: boolean;
@@ -21,6 +23,24 @@ type NewProductDialogProps = {
     submitLabel?: string;
     triggerLabel?: string;
     showTrigger?: boolean;
+};
+
+const formatPriceFromCents = (valueInCents: number) => {
+    const normalized = Number.isFinite(valueInCents)
+        ? Math.max(0, Math.trunc(valueInCents))
+        : 0;
+
+    return (normalized / 100).toFixed(2).replace(".", ",");
+};
+
+const parseMaskedPriceToCents = (maskedValue: string) => {
+    const digitsOnly = maskedValue.replace(/\D/g, "");
+
+    if (!digitsOnly) {
+        return 0;
+    }
+
+    return Number.parseInt(digitsOnly, 10);
 };
 
 export const NewProductDialog = ({
@@ -32,6 +52,7 @@ export const NewProductDialog = ({
     selectedCategoryIds,
     onToggleCategory,
     currentImageUrl = null,
+    selectedImageFile = null,
     onImageFileChange,
     onSubmit,
     isSubmitting,
@@ -41,6 +62,31 @@ export const NewProductDialog = ({
     triggerLabel = "Adicionar Novo Produto",
     showTrigger = true,
 }: NewProductDialogProps) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedImagePreviewUrl, setSelectedImagePreviewUrl] = useState<
+        string | null
+    >(null);
+
+    useEffect(() => {
+        if (!selectedImageFile) {
+            setSelectedImagePreviewUrl(null);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(selectedImageFile);
+        setSelectedImagePreviewUrl(objectUrl);
+
+        return () => {
+            URL.revokeObjectURL(objectUrl);
+        };
+    }, [selectedImageFile]);
+
+    const previewImageUrl = selectedImagePreviewUrl ?? currentImageUrl;
+
+    const openFilePicker = () => {
+        fileInputRef.current?.click();
+    };
+
     return (
         <DashboardActionDialog
             open={open}
@@ -50,14 +96,16 @@ export const NewProductDialog = ({
             onSubmit={onSubmit}
             isSubmitting={isSubmitting}
             submitLabel={submitLabel}
-            trigger={showTrigger ? (
-                <button
-                    type="button"
-                    className="cursor-pointer rounded-xl bg-[#334D40] px-5 py-3 text-sm font-semibold text-[#DBD7CB]"
-                >
-                    {triggerLabel}
-                </button>
-            ) : null}
+            trigger={
+                showTrigger ? (
+                    <button
+                        type="button"
+                        className="cursor-pointer rounded-xl bg-[#334D40] px-5 py-3 text-sm font-semibold text-[#DBD7CB]"
+                    >
+                        {triggerLabel}
+                    </button>
+                ) : null
+            }
         >
             <div className="space-y-1">
                 <label className="text-sm font-medium">Nome</label>
@@ -79,17 +127,18 @@ export const NewProductDialog = ({
                 <div className="space-y-1">
                     <label className="text-sm font-medium">Preço</label>
                     <input
-                        type="number"
-                        min={0}
-                        value={form.price}
+                        type="text"
+                        inputMode="numeric"
+                        value={formatPriceFromCents(form.price)}
                         onChange={(event) =>
                             onChange({
                                 ...form,
-                                price: Number(event.target.value),
+                                price: parseMaskedPriceToCents(
+                                    event.target.value,
+                                ),
                             })
                         }
                         className="w-full rounded-xl border border-[#334D40]/20 px-3 py-2"
-                        required
                     />
                 </div>
                 <div className="space-y-1">
@@ -127,19 +176,72 @@ export const NewProductDialog = ({
                 </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-2">
                 <label className="text-sm font-medium">Imagem do produto</label>
+
                 <input
+                    ref={fileInputRef}
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                     onChange={(event) =>
                         onImageFileChange(event.target.files?.item(0) ?? null)
                     }
-                    className="w-full rounded-xl border border-[#334D40]/20 px-3 py-2"
+                    className="hidden"
                 />
-                {currentImageUrl ? (
-                    <p className="text-xs text-[#334D40]/75 break-all">
-                        Imagem atual: {currentImageUrl}
+
+                <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={openFilePicker}
+                    onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            openFilePicker();
+                        }
+                    }}
+                    className="group relative h-44 w-full cursor-pointer overflow-hidden rounded-2xl border border-dashed border-[#334D40]/30 bg-[#F8F7F3]"
+                >
+                    {previewImageUrl ? (
+                        <img
+                            src={previewImageUrl}
+                            alt="Preview da imagem do produto"
+                            className="h-full w-full object-cover"
+                        />
+                    ) : (
+                        <div className="flex h-full items-center justify-center px-6 text-center text-sm text-[#334D40]/70">
+                            Clique para enviar uma imagem (JPEG, PNG ou WEBP)
+                        </div>
+                    )}
+
+                    <div className="pointer-events-none absolute inset-0 bg-[#0B1711]/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                        <div className="flex h-full items-center justify-center text-sm font-semibold text-white">
+                            Editar imagem
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={openFilePicker}
+                        className="rounded-lg border border-[#334D40]/20 px-3 py-1.5 text-xs font-medium text-[#334D40]"
+                    >
+                        {previewImageUrl ? "Trocar imagem" : "Selecionar imagem"}
+                    </button>
+                    {previewImageUrl ? (
+                        <button
+                            type="button"
+                            onClick={() => onImageFileChange(null)}
+                            className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700"
+                        >
+                            Remover imagem
+                        </button>
+                    ) : null}
+                </div>
+
+                {selectedImageFile ? (
+                    <p className="text-xs text-[#334D40]/75">
+                        Arquivo selecionado: {selectedImageFile.name}
                     </p>
                 ) : null}
             </div>
@@ -176,7 +278,9 @@ export const NewProductDialog = ({
                                     checked={selectedCategoryIds.includes(
                                         category.id,
                                     )}
-                                    onChange={() => onToggleCategory(category.id)}
+                                    onChange={() =>
+                                        onToggleCategory(category.id)
+                                    }
                                 />
                                 {category.name}
                             </label>

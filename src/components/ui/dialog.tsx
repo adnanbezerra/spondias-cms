@@ -164,7 +164,14 @@ export function DialogContent({
 
     return (
         <DialogPortal>
-            <div className="fixed inset-0 z-50 grid place-items-center p-4">
+            <div
+                className="fixed inset-0 z-50 grid place-items-center p-4"
+                onMouseDown={(event) => {
+                    if (event.target === event.currentTarget) {
+                        onOpenChange(false);
+                    }
+                }}
+            >
                 <div
                     role="dialog"
                     aria-modal="true"

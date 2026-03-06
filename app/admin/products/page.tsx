@@ -32,13 +32,13 @@ export default function AdminProductsPage() {
         products,
         categories,
         form,
+        imageFile,
         selectedCategoryIds,
         currentImageUrl,
         editingProductId,
         isDialogOpen,
         isLoading,
         isSubmitting,
-        errorMessage,
         categoryMap,
         setForm,
         setImageFile,
@@ -87,6 +87,7 @@ export default function AdminProductsPage() {
                             onToggleCategory={onToggleCategory}
                             currentImageUrl={currentImageUrl}
                             onImageFileChange={setImageFile}
+                            selectedImageFile={imageFile}
                             onSubmit={onSubmitProduct}
                             isSubmitting={isSubmitting}
                             showTrigger={false}
@@ -106,12 +107,6 @@ export default function AdminProductsPage() {
                                     : "Salvar Produto"
                             }
                         />
-
-                        {errorMessage ? (
-                            <p className="mb-4 rounded-xl bg-red-100 px-3 py-2 text-sm text-red-800">
-                                {errorMessage}
-                            </p>
-                        ) : null}
 
                         <section className="rounded-2xl border border-[#334D40]/15 bg-white p-5 shadow-sm">
                             <h2 className="text-xl font-semibold [font-family:var(--font-title)]">

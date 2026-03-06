@@ -14,6 +14,7 @@ import {
 } from "@/src/components/admin/dashboard/dashboard-types";
 import {
     confirmDestructiveAction,
+    getErrorMessage,
     handlePageError,
     runWithSubmittingState,
     toggleStringInList,
@@ -30,7 +31,6 @@ export function useAdminProductsPage() {
     const [editingProductId, setEditingProductId] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { showToast } = useAdminToast();
 
     const categoryMap = useMemo(
@@ -56,7 +56,6 @@ export function useAdminProductsPage() {
                     showToast,
                     toastMessage: "Falha ao carregar dados de produtos.",
                     fallbackMessage: "Falha ao carregar dados de produtos.",
-                    setErrorMessage,
                 });
             })
             .finally(() => {
@@ -78,8 +77,6 @@ export function useAdminProductsPage() {
     };
 
     const onEditProduct = async (productId: string) => {
-        setErrorMessage(null);
-
         try {
             const product = await fetchJson<AdminProduct>(
                 `/api/admin/products/${productId}`,
@@ -103,7 +100,6 @@ export function useAdminProductsPage() {
                 showToast,
                 toastMessage: "Falha ao carregar produto para edição.",
                 fallbackMessage: "Falha ao carregar produto.",
-                setErrorMessage,
             });
         }
     };
@@ -114,7 +110,6 @@ export function useAdminProductsPage() {
 
     const onSubmitProduct = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setErrorMessage(null);
 
         await runWithSubmittingState(setIsSubmitting, async () => {
             try {
@@ -161,12 +156,9 @@ export function useAdminProductsPage() {
                     { variant: "success" },
                 );
             } catch (error) {
-                handlePageError({
-                    error,
-                    showToast,
-                    toastMessage: "Falha ao salvar produto.",
-                    fallbackMessage: "Falha ao salvar produto.",
-                    setErrorMessage,
+                showToast(getErrorMessage(error, "Falha ao salvar produto."), {
+                    variant: "error",
+                    durationMs: 5000,
                 });
             }
         });
@@ -194,7 +186,6 @@ export function useAdminProductsPage() {
                 showToast,
                 toastMessage: "Falha ao excluir produto.",
                 fallbackMessage: "Falha ao excluir produto.",
-                setErrorMessage,
             });
         }
     };
@@ -203,13 +194,13 @@ export function useAdminProductsPage() {
         products,
         categories,
         form,
+        imageFile,
         selectedCategoryIds,
         currentImageUrl,
         editingProductId,
         isDialogOpen,
         isLoading,
         isSubmitting,
-        errorMessage,
         categoryMap,
         setForm,
         setImageFile,

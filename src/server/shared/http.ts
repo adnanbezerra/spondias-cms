@@ -23,6 +23,17 @@ export const toErrorResponse = (error: unknown): Response => {
         );
     }
 
+    if (error instanceof Error) {
+        console.error("[http] Erro não tratado:", error);
+        return Response.json(
+            {
+                code: "INTERNAL_ERROR",
+                message: error.message,
+            },
+            { status: 500 },
+        );
+    }
+
     return Response.json(
         {
             code: "INTERNAL_ERROR",
