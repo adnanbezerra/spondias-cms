@@ -2,7 +2,6 @@ import { randomBytes, scryptSync } from "node:crypto";
 import prismaClientPkg from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pgPkg from "pg";
-import "dotenv/config";
 
 const { PrismaClient } = prismaClientPkg;
 const { Pool } = pgPkg;

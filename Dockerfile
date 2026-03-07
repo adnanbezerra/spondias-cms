@@ -30,4 +30,4 @@ COPY --from=builder /app/next.config.ts ./next.config.ts
 USER nextjs
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start -- -H 0.0.0.0 -p ${PORT}"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run prisma:seed && npm run start -- -H 0.0.0.0 -p ${PORT}"]
