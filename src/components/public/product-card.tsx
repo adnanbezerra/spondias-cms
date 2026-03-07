@@ -21,7 +21,11 @@ const calculateFinalPrice = (
     );
 };
 
-const formatBRL = (valueInCents: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valueInCents / 100);
+const formatBRL = (valueInCents: number) =>
+    new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+    }).format(valueInCents / 100);
 
 export const ProductCard = ({
     product,
@@ -38,7 +42,11 @@ export const ProductCard = ({
         <article
             className={`group rounded-2xl border border-[#334D40]/15 bg-white p-4 shadow-sm ${className}`}
         >
-            <button type="button" onClick={() => onOpenProduct(product.id)} className="w-full text-left">
+            <button
+                type="button"
+                onClick={() => onOpenProduct(product.id)}
+                className="w-full text-left"
+            >
                 <Image
                     src={product.image}
                     alt={product.name}
@@ -51,9 +59,6 @@ export const ProductCard = ({
                     <h3 className="text-lg font-semibold [font-family:var(--font-title)]">
                         {product.name}
                     </h3>
-                    <p className="text-sm text-[#334D40]/80">
-                        {product.description}
-                    </p>
                 </div>
             </button>
 

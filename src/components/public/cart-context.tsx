@@ -9,6 +9,7 @@ import {
     useState,
     type ReactNode,
 } from "react";
+import { usePublicToast } from "@/src/components/public/public-toast";
 import type { PublicProduct } from "@/src/server/public/public-content";
 
 type CartItem = {
@@ -58,6 +59,7 @@ const getInitialItems = (): CartItem[] => {
 
 export function CartProvider({ children, whatsappNumber }: CartProviderProps) {
     const [items, setItems] = useState<CartItem[]>(getInitialItems);
+    const { showToast } = usePublicToast();
 
     useEffect(() => {
         if (items.length === 0) {
@@ -81,7 +83,8 @@ export function CartProvider({ children, whatsappNumber }: CartProviderProps) {
                     : item,
             );
         });
-    }, []);
+        showToast("Produto adicionado ao carrinho.", { variant: "success" });
+    }, [showToast]);
 
     const removeFromCart = useCallback((productId: string) => {
         setItems((current) => current.filter((item) => item.product.id !== productId));

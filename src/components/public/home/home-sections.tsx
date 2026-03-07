@@ -70,7 +70,7 @@ export function HomeSections({ sections }: HomeSectionsProps) {
                                 <ProductCard
                                     key={product.id}
                                     product={product}
-                                    className="mr-4 min-w-[250px]"
+                                    className="mr-4 w-[250px]"
                                     onOpenProduct={openProduct}
                                     onAddToCart={addToCart}
                                 />
@@ -85,6 +85,7 @@ export function HomeSections({ sections }: HomeSectionsProps) {
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
                     details={selectedProduct}
+                    onSelectRelatedProduct={openProduct}
                 />
             ) : null}
         </section>

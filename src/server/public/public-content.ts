@@ -25,7 +25,10 @@ type ProductEntity = {
     stock: number;
     image: string | null;
     isActive: boolean;
-    categories: Array<{ categoryId: string; category: { name: string; isActive: boolean } }>;
+    categories: Array<{
+        categoryId: string;
+        category: { name: string; isActive: boolean };
+    }>;
 };
 
 export type PublicStoreConfig = {
@@ -128,12 +131,16 @@ export const getPublicCategories = async (): Promise<PublicCategory[]> => {
     }
 };
 
-const mapProductToPublicProduct = (product: ProductEntity): PublicProduct | null => {
+const mapProductToPublicProduct = (
+    product: ProductEntity,
+): PublicProduct | null => {
     if (!product.isActive) {
         return null;
     }
 
-    const activeCategories = product.categories.filter((item) => item.category.isActive);
+    const activeCategories = product.categories.filter(
+        (item) => item.category.isActive,
+    );
 
     return {
         id: product.id,
@@ -196,7 +203,9 @@ const getProductsByCategoryIds = async (
 const mapSectionToPublicSection = async (
     section: SectionWithCategories,
 ): Promise<PublicSection> => {
-    const categoryIds = section.categories.map((relation) => relation.categoryId);
+    const categoryIds = section.categories.map(
+        (relation) => relation.categoryId,
+    );
 
     return {
         id: section.id,
@@ -229,7 +238,9 @@ export const getHomeSections = async (): Promise<PublicSection[]> => {
                 orderBy: [{ order: "asc" }, { name: "asc" }],
             });
 
-        return Promise.all(sections.map((section) => mapSectionToPublicSection(section)));
+        return Promise.all(
+            sections.map((section) => mapSectionToPublicSection(section)),
+        );
     } catch {
         return [];
     }
@@ -310,20 +321,21 @@ export const getPublicProductDetailsById = async (
                 continue;
             }
 
-            const sameCategoryProducts = await getPrismaClient().product.findMany({
-                where: {
-                    id: { not: product.id },
-                    isActive: true,
-                    categories: {
-                        some: {
-                            categoryId: relation.categoryId,
+            const sameCategoryProducts =
+                await getPrismaClient().product.findMany({
+                    where: {
+                        id: { not: product.id },
+                        isActive: true,
+                        categories: {
+                            some: {
+                                categoryId: relation.categoryId,
+                            },
                         },
                     },
-                },
-                ...productIncludeArgs,
-                orderBy: [{ name: "asc" }],
-                take: 8,
-            });
+                    ...productIncludeArgs,
+                    orderBy: [{ name: "asc" }],
+                    take: 8,
+                });
 
             relatedByCategory.push({
                 categoryId: relation.categoryId,

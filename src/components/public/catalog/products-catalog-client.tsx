@@ -86,6 +86,7 @@ export function ProductsCatalogClient({ products }: ProductsCatalogClientProps) 
                         }
                     }}
                     details={selectedProduct}
+                    onSelectRelatedProduct={openProduct}
                 />
             ) : null}
         </>

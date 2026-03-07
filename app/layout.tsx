@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CartProvider } from "@/src/components/public/cart-context";
+import { PublicToastProvider } from "@/src/components/public/public-toast";
 import { WhatsAppFloat } from "@/src/components/public/whatsapp-float";
 import { getPublicStoreConfig } from "@/src/server/public/public-content";
 import "./globals.css";
@@ -25,10 +26,12 @@ export default async function RootLayout({
     return (
         <html lang="pt-BR">
             <body className="antialiased">
-                <CartProvider whatsappNumber={config.whatsappNumber}>
-                    {children}
-                    <WhatsAppFloat whatsappNumber={config.whatsappNumber} />
-                </CartProvider>
+                <PublicToastProvider>
+                    <CartProvider whatsappNumber={config.whatsappNumber}>
+                        {children}
+                        <WhatsAppFloat whatsappNumber={config.whatsappNumber} />
+                    </CartProvider>
+                </PublicToastProvider>
             </body>
         </html>
     );
