@@ -5,6 +5,7 @@ FROM base AS deps
 COPY package.json package-lock.json ./
 RUN npm install
 RUN npm ci
+RUN apt-get update -y && apt-get install -y openssl
 
 FROM base AS builder
 ENV NODE_ENV=production
