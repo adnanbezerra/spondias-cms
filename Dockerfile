@@ -6,6 +6,7 @@ RUN apt-get update -y \
 
 FROM base AS deps
 COPY package.json package-lock.json ./
+RUN npm install
 RUN npm ci
 
 FROM base AS builder
