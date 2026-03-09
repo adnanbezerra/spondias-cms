@@ -46,9 +46,6 @@ COPY . .
 RUN npm run prisma:generate
 RUN npm run build
 
-RUN npm run prisma:generate
-RUN npm run build
-
 FROM base AS runner
 ENV NODE_ENV=production
 ENV PORT=3000
