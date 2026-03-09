@@ -7,8 +7,6 @@ const globalForMongoose = globalThis as typeof globalThis & {
 };
 
 export const getMongooseConnection = async (): Promise<typeof mongoose> => {
-    console.log("[mongoose] getMongooseConnection chamado.");
-
     const mongodbUrl = process.env.MONGODB_URL;
     if (!mongodbUrl) {
         console.error("[mongoose] MONGODB_URL não definida.");
@@ -16,20 +14,12 @@ export const getMongooseConnection = async (): Promise<typeof mongoose> => {
     }
 
     if (globalForMongoose.mongooseConnection) {
-        console.log(
-            `[mongoose] Reutilizando conexão em cache para o banco "${globalForMongoose.mongooseConnection.connection.name}".`,
-        );
         return globalForMongoose.mongooseConnection;
     }
 
     if (!globalForMongoose.mongooseConnectionPromise) {
-        console.log("[mongoose] Iniciando nova conexão com MongoDB...");
         globalForMongoose.mongooseConnectionPromise =
             mongoose.connect(mongodbUrl);
-    } else {
-        console.log(
-            "[mongoose] Aguardando promise de conexão já existente no cache.",
-        );
     }
 
     try {
@@ -44,10 +34,6 @@ export const getMongooseConnection = async (): Promise<typeof mongoose> => {
             `Falha ao conectar no MongoDB: ${details}`,
         );
     }
-
-    console.log(
-        `[mongoose] Conectado com sucesso ao banco "${globalForMongoose.mongooseConnection.connection.name}".`,
-    );
 
     return globalForMongoose.mongooseConnection;
 };

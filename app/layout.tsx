@@ -10,9 +10,9 @@ export const metadata: Metadata = {
     description:
         "Loja de plantas da Spondias com catálogo online e atendimento via WhatsApp.",
     icons: {
-        icon: "/logo.jpg",
-        shortcut: "/logo.jpg",
-        apple: "/logo.jpg",
+        icon: [{ url: "/logo.jpg", type: "image/jpeg" }],
+        shortcut: ["/logo.jpg"],
+        apple: [{ url: "/logo.jpg", type: "image/jpeg" }],
     },
 };
 

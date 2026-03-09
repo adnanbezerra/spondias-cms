@@ -7,8 +7,6 @@ const globalForPrisma = globalThis as typeof globalThis & {
 };
 
 export const getPrismaClient = (): PrismaClient => {
-    console.log("[prisma] getPrismaClient chamado.");
-
     if (!globalForPrisma.prisma) {
         const databaseUrl = process.env.DATABASE_URL;
         if (!databaseUrl) {
@@ -16,7 +14,6 @@ export const getPrismaClient = (): PrismaClient => {
             throw new Error("DATABASE_URL não definida.");
         }
 
-        console.log("[prisma] Criando novo PrismaClient...");
         const pool = new Pool({
             connectionString: databaseUrl,
         });
@@ -25,9 +22,6 @@ export const getPrismaClient = (): PrismaClient => {
         });
         const adapter = new PrismaPg(pool);
         globalForPrisma.prisma = new PrismaClient({ adapter });
-        console.log("[prisma] PrismaClient criado com sucesso.");
-    } else {
-        console.log("[prisma] Reutilizando PrismaClient em cache.");
     }
 
     return globalForPrisma.prisma;
