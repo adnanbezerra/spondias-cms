@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogOverlay,
 } from "@/src/components/ui/dialog";
@@ -212,7 +213,28 @@ export function ProductViewDialog({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogOverlay />
-            <DialogContent className="max-h-[90vh] max-w-6xl! overflow-auto p-0">
+            <DialogContent className="relative max-h-[90vh] max-w-6xl! overflow-auto p-0">
+                <DialogClose asChild>
+                    <button
+                        type="button"
+                        className="absolute right-3 top-3 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-[#5C7F49] shadow-[0_8px_24px_rgba(51,77,64,0.14)] ring-1 ring-[#334D40]/10 transition hover:bg-white hover:shadow-[0_10px_28px_rgba(51,77,64,0.18)] focus:outline-none focus:ring-2 focus:ring-[#5C7F49]/35"
+                        aria-label="Fechar produto"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path d="M6 6l12 12" />
+                            <path d="M18 6L6 18" />
+                        </svg>
+                    </button>
+                </DialogClose>
                 <ProductViewContent
                     details={details}
                     shareUrl={shareUrl}

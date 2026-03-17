@@ -65,7 +65,7 @@ export function HomeSections({ sections }: HomeSectionsProps) {
                     ) : null}
 
                     {section.products.length > 0 ? (
-                        <div className="flex max-h-[360px] overflow-scroll">
+                        <div className="flex max-h-[360px] overflow-auto">
                             {section.products.map((product) => (
                                 <ProductCard
                                     key={product.id}
