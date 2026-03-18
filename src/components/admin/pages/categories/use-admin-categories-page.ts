@@ -39,8 +39,8 @@ export function useAdminCategoriesPage() {
                 handlePageError({
                     error,
                     showToast,
-                    toastMessage: "Falha ao carregar categorias.",
-                    fallbackMessage: "Falha ao carregar categorias.",
+                    toastMessage: "Falha ao carregar linhas.",
+                    fallbackMessage: "Falha ao carregar linhas.",
                     setErrorMessage,
                 });
             })
@@ -69,6 +69,7 @@ export function useAdminCategoriesPage() {
             setEditingCategoryId(category.id);
             setForm({
                 name: category.name,
+                pricePerGram: category.pricePerGram,
                 isActive: category.isActive,
             });
             setIsDialogOpen(true);
@@ -76,8 +77,8 @@ export function useAdminCategoriesPage() {
             handlePageError({
                 error,
                 showToast,
-                toastMessage: "Falha ao carregar categoria para edição.",
-                fallbackMessage: "Falha ao carregar categoria.",
+                toastMessage: "Falha ao carregar linha para edição.",
+                fallbackMessage: "Falha ao carregar linha.",
                 setErrorMessage,
             });
         }
@@ -98,7 +99,7 @@ export function useAdminCategoriesPage() {
                             body: JSON.stringify(form),
                         },
                     );
-                    showToast("Categoria atualizada com sucesso.", {
+                    showToast("Linha atualizada com sucesso.", {
                         variant: "success",
                     });
                 } else {
@@ -106,7 +107,7 @@ export function useAdminCategoriesPage() {
                         method: "POST",
                         body: JSON.stringify(form),
                     });
-                    showToast("Categoria criada com sucesso.", {
+                    showToast("Linha criada com sucesso.", {
                         variant: "success",
                     });
                 }
@@ -118,8 +119,8 @@ export function useAdminCategoriesPage() {
                 handlePageError({
                     error,
                     showToast,
-                    toastMessage: "Falha ao salvar categoria.",
-                    fallbackMessage: "Falha ao salvar categoria.",
+                    toastMessage: "Falha ao salvar linha.",
+                    fallbackMessage: "Falha ao salvar linha.",
                     setErrorMessage,
                 });
             }
@@ -128,7 +129,7 @@ export function useAdminCategoriesPage() {
 
     const onDeleteCategory = async (categoryId: string) => {
         const approved = confirmDestructiveAction(
-            "Deseja realmente excluir esta categoria?",
+            "Deseja realmente excluir esta linha?",
         );
         if (!approved) return;
 
@@ -139,7 +140,7 @@ export function useAdminCategoriesPage() {
                     method: "DELETE",
                 },
             );
-            showToast("Categoria excluída com sucesso.", {
+            showToast("Linha excluída com sucesso.", {
                 variant: "success",
             });
 
@@ -152,8 +153,8 @@ export function useAdminCategoriesPage() {
             handlePageError({
                 error,
                 showToast,
-                toastMessage: "Falha ao excluir categoria.",
-                fallbackMessage: "Falha ao excluir categoria.",
+                toastMessage: "Falha ao excluir linha.",
+                fallbackMessage: "Falha ao excluir linha.",
                 setErrorMessage,
             });
         }

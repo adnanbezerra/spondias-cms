@@ -10,17 +10,6 @@ type ProductCardProps = {
     onAddToCart: (product: PublicProduct) => void;
 };
 
-const calculateFinalPrice = (
-    priceInCents: number,
-    discountPercentage: number,
-): number => {
-    if (discountPercentage <= 0) return priceInCents;
-    return Math.max(
-        0,
-        Math.round(priceInCents * (1 - discountPercentage / 100)),
-    );
-};
-
 const formatBRL = (valueInCents: number) =>
     new Intl.NumberFormat("pt-BR", {
         style: "currency",
@@ -33,10 +22,13 @@ export const ProductCard = ({
     onOpenProduct,
     onAddToCart,
 }: ProductCardProps) => {
-    const finalPrice = calculateFinalPrice(
-        product.priceInCents,
-        product.discountPercentage,
-    );
+    const hasDiscount = product.discountPercentage > 0;
+    const price70 = hasDiscount
+        ? Math.round(product.price70gInCents * (1 - product.discountPercentage / 100))
+        : product.price70gInCents;
+    const price100 = hasDiscount
+        ? Math.round(product.price100gInCents * (1 - product.discountPercentage / 100))
+        : product.price100gInCents;
 
     return (
         <article
@@ -64,13 +56,16 @@ export const ProductCard = ({
 
             <div className="mt-4 flex items-end justify-between gap-3">
                 <div>
-                    {product.discountPercentage > 0 ? (
+                    {hasDiscount ? (
                         <p className="text-xs text-[#334D40]/70 line-through">
-                            {formatBRL(product.priceInCents)}
+                            70g {formatBRL(product.price70gInCents)} · 100g {formatBRL(product.price100gInCents)}
                         </p>
                     ) : null}
-                    <p className="text-lg font-semibold">
-                        {formatBRL(finalPrice)}
+                    <p className="text-sm font-semibold">
+                        70g: {formatBRL(price70)}
+                    </p>
+                    <p className="text-sm font-semibold">
+                        100g: {formatBRL(price100)}
                     </p>
                     <p className="text-xs text-[#334D40]/70">
                         Estoque: {product.stock}

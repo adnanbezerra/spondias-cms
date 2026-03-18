@@ -4,12 +4,15 @@ export type ProductRecord = {
     id: string;
     name: string;
     description: string;
-    price: number;
     stock: number;
     discountPercentage: number;
     image: string | null;
     isActive: boolean;
     categoryIds: string[];
+    lineName: string | null;
+    pricePerGram: number;
+    price70g: number;
+    price100g: number;
     createdAt: Date;
     updatedAt: Date;
 };
@@ -18,29 +21,42 @@ type ProductRow = {
     id: string;
     name: string;
     description: string;
-    price: number;
     stock: number;
     discountPercentage: number;
     image: string | null;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
-    categories: Array<{ categoryId: string }>;
+    categories: Array<{
+        categoryId: string;
+        category: {
+            name: string;
+            pricePerGram: number;
+        };
+    }>;
 };
 
-const mapRowToRecord = (row: ProductRow): ProductRecord => ({
-    id: row.id,
-    name: row.name,
-    description: row.description,
-    price: row.price,
-    stock: row.stock,
-    discountPercentage: row.discountPercentage,
-    image: row.image,
-    isActive: row.isActive,
-    categoryIds: row.categories.map((category) => category.categoryId),
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-});
+const mapRowToRecord = (row: ProductRow): ProductRecord => {
+    const line = row.categories[0]?.category;
+    const pricePerGram = line?.pricePerGram ?? 0;
+
+    return {
+        id: row.id,
+        name: row.name,
+        description: row.description,
+        stock: row.stock,
+        discountPercentage: row.discountPercentage,
+        image: row.image,
+        isActive: row.isActive,
+        categoryIds: row.categories.map((category) => category.categoryId),
+        lineName: line?.name ?? null,
+        pricePerGram,
+        price70g: pricePerGram * 70,
+        price100g: pricePerGram * 100,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+    };
+};
 
 export type ProductRepository = {
     list(): Promise<ProductRecord[]>;
@@ -49,7 +65,6 @@ export type ProductRepository = {
     create(data: {
         name: string;
         description: string;
-        price: number;
         stock: number;
         discountPercentage: number;
         image: string | null;
@@ -61,7 +76,6 @@ export type ProductRepository = {
         data: Partial<{
             name: string;
             description: string;
-            price: number;
             stock: number;
             discountPercentage: number;
             image: string | null;
@@ -79,6 +93,12 @@ export const prismaProductRepository: ProductRepository = {
                 categories: {
                     select: {
                         categoryId: true,
+                        category: {
+                            select: {
+                                name: true,
+                                pricePerGram: true,
+                            },
+                        },
                     },
                     orderBy: {
                         categoryId: "asc",
@@ -95,7 +115,15 @@ export const prismaProductRepository: ProductRepository = {
             where: { id },
             include: {
                 categories: {
-                    select: { categoryId: true },
+                    select: {
+                        categoryId: true,
+                        category: {
+                            select: {
+                                name: true,
+                                pricePerGram: true,
+                            },
+                        },
+                    },
                     orderBy: { categoryId: "asc" },
                 },
             },
@@ -114,7 +142,15 @@ export const prismaProductRepository: ProductRepository = {
             },
             include: {
                 categories: {
-                    select: { categoryId: true },
+                    select: {
+                        categoryId: true,
+                        category: {
+                            select: {
+                                name: true,
+                                pricePerGram: true,
+                            },
+                        },
+                    },
                     orderBy: { categoryId: "asc" },
                 },
             },
@@ -128,7 +164,7 @@ export const prismaProductRepository: ProductRepository = {
             data: {
                 name: data.name,
                 description: data.description,
-                price: data.price,
+                price: 0,
                 stock: data.stock,
                 discountPercentage: data.discountPercentage,
                 image: data.image,
@@ -144,7 +180,15 @@ export const prismaProductRepository: ProductRepository = {
             },
             include: {
                 categories: {
-                    select: { categoryId: true },
+                    select: {
+                        categoryId: true,
+                        category: {
+                            select: {
+                                name: true,
+                                pricePerGram: true,
+                            },
+                        },
+                    },
                     orderBy: { categoryId: "asc" },
                 },
             },
@@ -167,7 +211,6 @@ export const prismaProductRepository: ProductRepository = {
                 ...(data.description !== undefined
                     ? { description: data.description }
                     : {}),
-                ...(data.price !== undefined ? { price: data.price } : {}),
                 ...(data.stock !== undefined ? { stock: data.stock } : {}),
                 ...(data.discountPercentage !== undefined
                     ? { discountPercentage: data.discountPercentage }
@@ -190,7 +233,15 @@ export const prismaProductRepository: ProductRepository = {
             },
             include: {
                 categories: {
-                    select: { categoryId: true },
+                    select: {
+                        categoryId: true,
+                        category: {
+                            select: {
+                                name: true,
+                                pricePerGram: true,
+                            },
+                        },
+                    },
                     orderBy: { categoryId: "asc" },
                 },
             },

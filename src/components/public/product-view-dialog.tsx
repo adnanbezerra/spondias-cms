@@ -60,7 +60,7 @@ export function ProductViewContent({
                 </h2>
                 <div className="flex justify-center items-center w-fit h-fit">
                     <div className="h-fit text-xl font-semibold mr-4">
-                        {formatBRL(details.product.priceInCents)}
+                        70g: {formatBRL(details.product.price70gInCents)} · 100g: {formatBRL(details.product.price100gInCents)}
                     </div>
                     <div className="h-fit text-sm text-[#334D40]/75">
                         Estoque: {details.product.stock}
@@ -145,7 +145,7 @@ export function ProductViewContent({
                                             {product.name}
                                         </p>
                                         <p className="text-[#334D40]/70">
-                                            {formatBRL(product.priceInCents)}
+                                            70g: {formatBRL(product.price70gInCents)} · 100g: {formatBRL(product.price100gInCents)}
                                         </p>
                                         <p className="truncate text-[#334D40]/70">
                                             {product.categoryNames.join(" • ")}
@@ -170,7 +170,7 @@ export function ProductViewContent({
                                             {product.name}
                                         </p>
                                         <p className="text-[#334D40]/70">
-                                            {formatBRL(product.priceInCents)}
+                                            70g: {formatBRL(product.price70gInCents)} · 100g: {formatBRL(product.price100gInCents)}
                                         </p>
                                         <p className="truncate text-[#334D40]/70">
                                             {product.categoryNames.join(" • ")}

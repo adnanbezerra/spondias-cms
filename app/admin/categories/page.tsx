@@ -58,7 +58,7 @@ export default function AdminCategoriesPage() {
                                     Catálogo
                                 </p>
                                 <h1 className="mt-1 text-4xl font-semibold [font-family:var(--font-title)]">
-                                    Categorias
+                                    Linhas
                                 </h1>
                             </div>
 
@@ -67,7 +67,7 @@ export default function AdminCategoriesPage() {
                                 onClick={onOpenCreate}
                                 className="cursor-pointer rounded-xl border border-[#334D40]/20 bg-[#DBD7CB]/60 px-5 py-3 text-sm font-semibold"
                             >
-                                Adicionar Nova Categoria
+                                Adicionar Nova Linha
                             </button>
                         </header>
 
@@ -81,18 +81,18 @@ export default function AdminCategoriesPage() {
                             showTrigger={false}
                             title={
                                 editingCategoryId
-                                    ? "Editar Categoria"
-                                    : "Nova Categoria"
+                                    ? "Editar Linha"
+                                    : "Nova Linha"
                             }
                             description={
                                 editingCategoryId
-                                    ? "Atualize os dados da categoria selecionada."
-                                    : "Crie a categoria e publique na vitrine quando quiser."
+                                    ? "Atualize os dados da linha selecionada."
+                                    : "Crie a linha e configure o preço por grama."
                             }
                             submitLabel={
                                 editingCategoryId
                                     ? "Salvar Alterações"
-                                    : "Salvar Categoria"
+                                    : "Salvar Linha"
                             }
                         />
 
@@ -104,7 +104,7 @@ export default function AdminCategoriesPage() {
 
                         <section className="rounded-2xl border border-[#334D40]/15 bg-white p-5 shadow-sm">
                             <h2 className="text-xl font-semibold [font-family:var(--font-title)]">
-                                Categorias cadastradas
+                                Linhas cadastradas
                             </h2>
 
                             <div className="mt-3 space-y-3">

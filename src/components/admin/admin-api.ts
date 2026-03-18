@@ -3,6 +3,7 @@
 export type AdminCategory = {
     id: string;
     name: string;
+    pricePerGram: number;
     isActive: boolean;
     createdAt: string;
     updatedAt: string;
@@ -21,12 +22,15 @@ export type AdminProduct = {
     id: string;
     name: string;
     description: string;
-    price: number;
     stock: number;
     discountPercentage: number;
     image: string | null;
     isActive: boolean;
     categoryIds: string[];
+    lineName: string | null;
+    pricePerGram: number;
+    price70g: number;
+    price100g: number;
 };
 
 export type AdminStoreConfig = {

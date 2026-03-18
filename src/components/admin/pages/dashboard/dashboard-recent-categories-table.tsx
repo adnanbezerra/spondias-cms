@@ -77,16 +77,16 @@ export function DashboardRecentCategoriesTable({
         <section className="mt-8 overflow-hidden rounded-2xl border border-[#334D40]/15 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-[#334D40]/10 px-5 py-4">
                 <h2 className="text-xl font-semibold [font-family:var(--font-title)]">
-                    Categorias recentes
+                    Linhas recentes
                 </h2>
                 <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#334D40]/65">
-                    {rows.length} categorias
+                    {rows.length} linhas
                 </span>
             </div>
 
             {rows.length === 0 ? (
                 <p className="px-5 py-6 text-sm text-[#334D40]/80">
-                    Nenhuma categoria cadastrada ainda.
+                    Nenhuma linha cadastrada ainda.
                 </p>
             ) : (
                 <>
@@ -94,7 +94,7 @@ export function DashboardRecentCategoriesTable({
                         <table className="min-w-full text-left text-sm">
                             <thead className="bg-[#DBD7CB]/30 text-xs uppercase tracking-[0.12em] text-[#334D40]/75">
                                 <tr>
-                                    <th className="px-5 py-3 font-semibold">Nome da categoria</th>
+                                    <th className="px-5 py-3 font-semibold">Nome da linha</th>
                                     <th className="px-5 py-3 font-semibold">Total de produtos</th>
                                     <th className="px-5 py-3 font-semibold">Última atualização</th>
                                     <th className="px-5 py-3 font-semibold">Status</th>

@@ -18,7 +18,6 @@ import {
 import {
     handlePageError,
     runWithSubmittingState,
-    toggleStringInList,
 } from "@/src/components/admin/pages/shared/admin-page-helpers";
 
 export function useAdminDashboardPage() {
@@ -80,13 +79,13 @@ export function useAdminDashboardPage() {
                 setCategoryForm(initialCategoryForm);
                 setIsCategoryDialogOpen(false);
                 await loadData();
-                showToast("Categoria criada com sucesso.", { variant: "success" });
+                showToast("Linha criada com sucesso.", { variant: "success" });
             } catch (error) {
                 handlePageError({
                     error,
                     showToast,
-                    toastMessage: "Falha ao criar categoria.",
-                    fallbackMessage: "Falha ao criar categoria.",
+                    toastMessage: "Falha ao criar linha.",
+                    fallbackMessage: "Falha ao criar linha.",
                 });
             }
         });
@@ -99,7 +98,7 @@ export function useAdminDashboardPage() {
             try {
                 if (selectedCategoryIds.length === 0) {
                     throw new Error(
-                        "Selecione ao menos uma categoria para o produto.",
+                        "Selecione uma linha para o produto.",
                     );
                 }
 
@@ -134,7 +133,7 @@ export function useAdminDashboardPage() {
     };
 
     const onToggleCategory = (categoryId: string) => {
-        setSelectedCategoryIds((current) => toggleStringInList(current, categoryId));
+        setSelectedCategoryIds([categoryId]);
     };
 
     const onChangeProductDialog = (open: boolean) => {

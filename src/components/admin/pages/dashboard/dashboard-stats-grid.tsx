@@ -20,10 +20,10 @@ export function DashboardStatsGrid({
                 subtitle="produtos cadastrados"
             />
             <DashboardStatCard
-                title="Categorias"
+                title="Linhas"
                 href="/admin/categories"
                 count={categoryCount}
-                subtitle="categorias cadastradas"
+                subtitle="linhas cadastradas"
             />
             <DashboardStatCard
                 title="Seções"

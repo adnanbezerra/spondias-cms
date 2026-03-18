@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     fetchJson,
     uploadImage,
@@ -17,7 +17,6 @@ import {
     getErrorMessage,
     handlePageError,
     runWithSubmittingState,
-    toggleStringInList,
 } from "@/src/components/admin/pages/shared/admin-page-helpers";
 
 export function useAdminProductsPage() {
@@ -32,11 +31,6 @@ export function useAdminProductsPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { showToast } = useAdminToast();
-
-    const categoryMap = useMemo(
-        () => new Map(categories.map((category) => [category.id, category.name])),
-        [categories],
-    );
 
     const loadData = useCallback(async () => {
         const [productsPayload, categoriesPayload] = await Promise.all([
@@ -86,7 +80,6 @@ export function useAdminProductsPage() {
             setForm({
                 name: product.name,
                 description: product.description,
-                price: product.price,
                 stock: product.stock,
                 discountPercentage: product.discountPercentage,
                 isActive: product.isActive,
@@ -106,7 +99,7 @@ export function useAdminProductsPage() {
     };
 
     const onToggleCategory = (categoryId: string) => {
-        setSelectedCategoryIds((current) => toggleStringInList(current, categoryId));
+        setSelectedCategoryIds([categoryId]);
     };
 
     const onSubmitProduct = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -116,7 +109,7 @@ export function useAdminProductsPage() {
             try {
                 if (selectedCategoryIds.length === 0) {
                     throw new Error(
-                        "Selecione ao menos uma categoria para o produto.",
+                        "Selecione uma linha para o produto.",
                     );
                 }
 
@@ -202,7 +195,6 @@ export function useAdminProductsPage() {
         isDialogOpen,
         isLoading,
         isSubmitting,
-        categoryMap,
         setForm,
         setImageFile,
         setIsDialogOpen,

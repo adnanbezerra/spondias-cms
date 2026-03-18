@@ -25,24 +25,6 @@ type NewProductDialogProps = {
     showTrigger?: boolean;
 };
 
-const formatPriceFromCents = (valueInCents: number) => {
-    const normalized = Number.isFinite(valueInCents)
-        ? Math.max(0, Math.trunc(valueInCents))
-        : 0;
-
-    return (normalized / 100).toFixed(2).replace(".", ",");
-};
-
-const parseMaskedPriceToCents = (maskedValue: string) => {
-    const digitsOnly = maskedValue.replace(/\D/g, "");
-
-    if (!digitsOnly) {
-        return 0;
-    }
-
-    return Number.parseInt(digitsOnly, 10);
-};
-
 export const NewProductDialog = ({
     open,
     onOpenChange,
@@ -138,24 +120,7 @@ export const NewProductDialog = ({
                 />
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
-                <div className="space-y-1">
-                    <label className="text-sm font-medium">Preço</label>
-                    <input
-                        type="text"
-                        inputMode="numeric"
-                        value={formatPriceFromCents(form.price)}
-                        onChange={(event) =>
-                            onChange({
-                                ...form,
-                                price: parseMaskedPriceToCents(
-                                    event.target.value,
-                                ),
-                            })
-                        }
-                        className="w-full rounded-xl border border-[#334D40]/20 px-3 py-2"
-                    />
-                </div>
+            <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
                     <label className="text-sm font-medium">Estoque</label>
                     <input
@@ -278,11 +243,11 @@ export const NewProductDialog = ({
             </label>
 
             <div className="space-y-2">
-                <p className="text-sm font-medium">Categorias do produto</p>
+                <p className="text-sm font-medium">Linha do produto</p>
                 <div className="max-h-32 space-y-1 overflow-y-auto rounded-xl border border-[#334D40]/15 p-2">
                     {categories.length === 0 ? (
                         <p className="text-sm text-[#334D40]/75">
-                            Cadastre categorias antes de vincular.
+                            Cadastre uma linha antes de vincular.
                         </p>
                     ) : (
                         categories.map((category) => (
@@ -291,10 +256,9 @@ export const NewProductDialog = ({
                                 className="flex items-center gap-2 text-sm"
                             >
                                 <input
-                                    type="checkbox"
-                                    checked={selectedCategoryIds.includes(
-                                        category.id,
-                                    )}
+                                    type="radio"
+                                    name="product-line"
+                                    checked={selectedCategoryIds.includes(category.id)}
                                     onChange={() =>
                                         onToggleCategory(category.id)
                                     }

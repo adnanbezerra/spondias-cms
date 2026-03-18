@@ -30,6 +30,7 @@ export class CategoryService {
 
         const created = await this.repository.create({
             name: input.name,
+            pricePerGram: input.pricePerGram,
             isActive: input.isActive,
         });
 

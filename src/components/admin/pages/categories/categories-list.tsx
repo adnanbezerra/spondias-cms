@@ -32,7 +32,7 @@ export function CategoriesList({
                         <div>
                             <p className="font-semibold">{category.name}</p>
                             <p className="text-xs text-[#334D40]/75">
-                                {category.isActive ? "Ativa" : "Inativa"}
+                                Preço por grama: R$ {(category.pricePerGram / 100).toFixed(2).replace(".", ",")} · {category.isActive ? "Ativa" : "Inativa"}
                             </p>
                         </div>
                         <div className="flex items-center gap-2">

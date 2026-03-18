@@ -3,6 +3,7 @@ import { getPrismaClient } from "@/src/server/db/prisma";
 export type CategoryRecord = {
     id: string;
     name: string;
+    pricePerGram: number;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -12,8 +13,13 @@ export type CategoryRepository = {
     list(): Promise<CategoryRecord[]>;
     findById(id: string): Promise<CategoryRecord | null>;
     findByName(name: string): Promise<CategoryRecord | null>;
-    create(data: Pick<CategoryRecord, "name" | "isActive">): Promise<CategoryRecord>;
-    update(id: string, data: Partial<Pick<CategoryRecord, "name" | "isActive">>): Promise<CategoryRecord | null>;
+    create(
+        data: Pick<CategoryRecord, "name" | "pricePerGram" | "isActive">,
+    ): Promise<CategoryRecord>;
+    update(
+        id: string,
+        data: Partial<Pick<CategoryRecord, "name" | "pricePerGram" | "isActive">>,
+    ): Promise<CategoryRecord | null>;
     delete(id: string): Promise<boolean>;
 };
 
@@ -35,6 +41,7 @@ export const inMemoryCategoryRepository: CategoryRepository = {
         const record: CategoryRecord = {
             id: crypto.randomUUID(),
             name: data.name,
+            pricePerGram: data.pricePerGram,
             isActive: data.isActive,
             createdAt: now,
             updatedAt: now,
@@ -86,6 +93,7 @@ export const prismaCategoryRepository: CategoryRepository = {
         return getPrismaClient().category.create({
             data: {
                 name: data.name,
+                pricePerGram: data.pricePerGram,
                 isActive: data.isActive,
             },
         });

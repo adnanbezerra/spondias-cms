@@ -27,7 +27,7 @@ type ProductEntity = {
     isActive: boolean;
     categories: Array<{
         categoryId: string;
-        category: { name: string; isActive: boolean };
+        category: { name: string; isActive: boolean; pricePerGram: number };
     }>;
 };
 
@@ -48,6 +48,9 @@ export type PublicProduct = {
     id: string;
     name: string;
     priceInCents: number;
+    price70gInCents: number;
+    price100gInCents: number;
+    pricePerGramInCents: number;
     discountPercentage: number;
     stock: number;
     image: string;
@@ -142,10 +145,18 @@ const mapProductToPublicProduct = (
         (item) => item.category.isActive,
     );
 
+    const line = activeCategories[0]?.category;
+    const pricePerGramInCents = line?.pricePerGram ?? 0;
+    const price70gInCents = pricePerGramInCents * 70;
+    const price100gInCents = pricePerGramInCents * 100;
+
     return {
         id: product.id,
         name: product.name,
-        priceInCents: product.price,
+        priceInCents: price70gInCents,
+        price70gInCents,
+        price100gInCents,
+        pricePerGramInCents,
         discountPercentage: product.discountPercentage,
         stock: product.stock,
         image: product.image ?? "/logo.jpg",
@@ -163,6 +174,7 @@ const productIncludeArgs = {
                     select: {
                         name: true,
                         isActive: true,
+                        pricePerGram: true,
                     },
                 },
             },

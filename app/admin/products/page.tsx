@@ -39,7 +39,6 @@ export default function AdminProductsPage() {
         isDialogOpen,
         isLoading,
         isSubmitting,
-        categoryMap,
         setForm,
         setImageFile,
         setIsDialogOpen,
@@ -116,7 +115,6 @@ export default function AdminProductsPage() {
                             <div className="mt-3 space-y-3">
                                 <ProductsList
                                     products={products}
-                                    categoryMap={categoryMap}
                                     onEditProduct={onEditProduct}
                                     onDeleteProduct={onDeleteProduct}
                                 />

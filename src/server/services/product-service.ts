@@ -64,7 +64,6 @@ export class ProductService {
         const created = await this.productRepository.create({
             name: input.name,
             description: input.description,
-            price: input.price,
             stock: input.stock,
             discountPercentage: input.discountPercentage,
             image: input.image ?? null,
@@ -108,7 +107,6 @@ export class ProductService {
         const updated = await this.productRepository.update(id, {
             name: input.name,
             description: input.description,
-            price: input.price,
             stock: input.stock,
             discountPercentage: input.discountPercentage,
             image: input.image,

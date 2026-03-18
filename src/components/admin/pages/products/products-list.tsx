@@ -4,14 +4,12 @@ import type { AdminProduct } from "@/src/components/admin/admin-api";
 
 type ProductsListProps = {
     products: AdminProduct[];
-    categoryMap: Map<string, string>;
     onEditProduct: (productId: string) => void;
     onDeleteProduct: (productId: string) => void;
 };
 
 export function ProductsList({
     products,
-    categoryMap,
     onEditProduct,
     onDeleteProduct,
 }: ProductsListProps) {
@@ -49,28 +47,30 @@ export function ProductsList({
                             <div>
                                 <p className="font-semibold">{product.name}</p>
                                 <p className="text-xs text-[#334D40]/75">
-                                    Preço: R${" "}
-                                    {(product.price / 100)
+                                    Linha: {product.lineName ?? "Sem linha"}
+                                </p>
+                                <p className="text-xs text-[#334D40]/75">
+                                    Preço 70g: R${" "}
+                                    {(product.price70g / 100)
                                         .toFixed(2)
-                                        .replace(".", ",")}{" "}
+                                        .replace(".", ",")}
+                                    {" · "}
+                                    Preço 100g: R${" "}
+                                    {(product.price100g / 100)
+                                        .toFixed(2)
+                                        .replace(".", ",")}
+                                </p>
+                                <p className="text-xs text-[#334D40]/75">
+                                    Preço por grama: R${" "}
+                                    {(product.pricePerGram / 100)
+                                        .toFixed(2)
+                                        .replace(".", ",")}
                                     {" · "} Estoque: {product.stock}
                                 </p>
                                 <p className="text-xs text-[#334D40]/75">
-                                    Desconto: {product.discountPercentage}%{" "}
-                                    {" · "}{" "}
+                                    Desconto: {product.discountPercentage}%
+                                    {" · "}
                                     {product.isActive ? "Ativo" : "Inativo"}
-                                </p>
-                                <p className="text-xs text-[#334D40]/75">
-                                    Categorias:{" "}
-                                    {product.categoryIds.length > 0
-                                        ? product.categoryIds
-                                            .map(
-                                                (id) =>
-                                                    categoryMap.get(id) ??
-                                                      "Categoria",
-                                            )
-                                            .join(", ")
-                                        : "Sem categoria"}
                                 </p>
                             </div>
                         </div>

@@ -15,9 +15,7 @@ const pool = new Pool({
     connectionString: databaseUrl,
 });
 const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({
-    adapter,
-});
+const prisma = new PrismaClient({ adapter });
 const KEY_LENGTH = 64;
 
 const hashPassword = (plainPassword) => {
@@ -50,108 +48,54 @@ const storeConfig = {
     cnpj: "00.000.000/0000-00",
 };
 
+const catalogSectionId = "11111111-1111-4111-8111-111111111111";
+
 const seedSections = [
     {
-        id: "11111111-1111-4111-8111-111111111111",
-        name: "Plantas de Sol Pleno",
+        id: catalogSectionId,
+        name: "Linhas de produtos",
         isActive: true,
         order: 1,
         isBanner: false,
         bannerImg: null,
-        products: [
-            {
-                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
-                name: "Jiboia Limão",
-                description: "Folhagem pendente de fácil cuidado, ideal para meia-sombra.",
-                price: 4590,
-                discountPercentage: 10,
-                stock: 12,
-                image: "/logo.jpg",
-                isActive: true,
-            },
-            {
-                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
-                name: "Zamioculca",
-                description: "Planta resistente, perfeita para interiores e baixa manutenção.",
-                price: 6990,
-                discountPercentage: 0,
-                stock: 7,
-                image: "/logo.jpg",
-                isActive: true,
-            },
-        ],
-    },
-    {
-        id: "22222222-2222-4222-8222-222222222222",
-        name: "Oferta da Semana",
-        isActive: true,
-        order: 2,
-        isBanner: true,
-        bannerImg: "/logo.jpg",
-        products: [],
-    },
-    {
-        id: "33333333-3333-4333-8333-333333333333",
-        name: "Plantas para Vasos Suspensos",
-        isActive: true,
-        order: 3,
-        isBanner: false,
-        bannerImg: null,
-        products: [
-            {
-                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3",
-                name: "Hera Inglesa",
-                description: "Excelente opção para vasos suspensos com aspecto ornamental.",
-                price: 3290,
-                discountPercentage: 5,
-                stock: 21,
-                image: "/logo.jpg",
-                isActive: true,
-            },
-            {
-                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4",
-                name: "Colar de Pérolas",
-                description: "Suculenta pendente com visual delicado e ótimo destaque decorativo.",
-                price: 5490,
-                discountPercentage: 15,
-                stock: 9,
-                image: "/logo.jpg",
-                isActive: true,
-            },
-        ],
     },
 ];
 
 const seedCategories = [
-    {
-        id: "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
-        name: "Sol Pleno",
-        isActive: true,
-        sectionIds: ["11111111-1111-4111-8111-111111111111"],
-    },
-    {
-        id: "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
-        name: "Ofertas",
-        isActive: true,
-        sectionIds: ["22222222-2222-4222-8222-222222222222"],
-    },
-    {
-        id: "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
-        name: "Vasos Suspensos",
-        isActive: true,
-        sectionIds: ["33333333-3333-4333-8333-333333333333"],
-    },
+    { id: "cccccccc-cccc-4ccc-8ccc-cccccccccc01", name: "Linha RN", pricePerGram: 170, isActive: true, sectionIds: [catalogSectionId] },
+    { id: "cccccccc-cccc-4ccc-8ccc-cccccccccc02", name: "Linha Infantil", pricePerGram: 170, isActive: true, sectionIds: [catalogSectionId] },
+    { id: "cccccccc-cccc-4ccc-8ccc-cccccccccc03", name: "Linha Adulto", pricePerGram: 170, isActive: true, sectionIds: [catalogSectionId] },
+    { id: "cccccccc-cccc-4ccc-8ccc-cccccccccc04", name: "Dores Articulares", pricePerGram: 200, isActive: true, sectionIds: [catalogSectionId] },
+    { id: "cccccccc-cccc-4ccc-8ccc-cccccccccc05", name: "Especial", pricePerGram: 130, isActive: true, sectionIds: [catalogSectionId] },
+    { id: "cccccccc-cccc-4ccc-8ccc-cccccccccc06", name: "Linha Gestante/Lactante", pricePerGram: 170, isActive: true, sectionIds: [catalogSectionId] },
+    { id: "cccccccc-cccc-4ccc-8ccc-cccccccccc07", name: "Linha Infantil Premium", pricePerGram: 200, isActive: true, sectionIds: [catalogSectionId] },
+    { id: "cccccccc-cccc-4ccc-8ccc-cccccccccc08", name: "Linha Adulto Premium", pricePerGram: 200, isActive: true, sectionIds: [catalogSectionId] },
+    { id: "cccccccc-cccc-4ccc-8ccc-cccccccccc09", name: "Linha Gestante/Lactante Premium", pricePerGram: 200, isActive: true, sectionIds: [catalogSectionId] },
+];
+
+const seedProducts = [
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa01", name: "Hidrapele RN", description: "Hidrapele RN.", stock: 40, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc01" },
+
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa02", name: "Hidrapele infantil com ação de prevenção e tratamento de assaduras", description: "Hidrapele infantil com ação de prevenção e tratamento de assaduras.", stock: 35, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc02" },
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa03", name: "Hidrapele infantil com ação repelente", description: "Hidrapele infantil com ação repelente.", stock: 35, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc02" },
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa04", name: "Desodorante infantil", description: "Desodorante infantil.", stock: 28, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc07" },
+
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa05", name: "Hidrapele adulto", description: "Hidrapele adulto.", stock: 30, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc03" },
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa06", name: "Hidrapele adulto com ação repelente", description: "Hidrapele adulto com ação repelente.", stock: 30, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc03" },
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa07", name: "Desodorante adulto masculino e feminino", description: "Desodorante adulto, masculino e feminino.", stock: 26, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc08" },
+
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa08", name: "Creme para dores articulares", description: "Creme para dores articulares.", stock: 22, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc04" },
+
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa09", name: "Hidrapele especial para dermatite", description: "Hidrapele especial para dermatite.", stock: 18, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc05" },
+
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa10", name: "Hidrapele gestante lactante", description: "Hidrapele gestante lactante.", stock: 24, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc06" },
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa11", name: "Hidrapele com ação repelente gestante lactante", description: "Hidrapele com ação repelente, gestante lactante.", stock: 24, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc06" },
+    { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa12", name: "Desodorante gestante lactante", description: "Desodorante gestante lactante.", stock: 20, discountPercentage: 0, image: "/logo.jpg", isActive: true, categoryId: "cccccccc-cccc-4ccc-8ccc-cccccccccc09" },
 ];
 
 const seed = async () => {
-    const existingAdminByEmail = await prisma.user.findUnique({
-        where: { email: adminUser.email },
-        select: { id: true },
-    });
-    const existingAdminByCpf = await prisma.user.findUnique({
-        where: { cpf: adminUser.cpf },
-        select: { id: true },
-    });
+    const existingAdminByEmail = await prisma.user.findUnique({ where: { email: adminUser.email }, select: { id: true } });
+    const existingAdminByCpf = await prisma.user.findUnique({ where: { cpf: adminUser.cpf }, select: { id: true } });
 
     if (!existingAdminByEmail && !existingAdminByCpf) {
         const passwordHash = hashPassword(adminUser.password);
@@ -168,122 +112,45 @@ const seed = async () => {
 
     const storeConfigCount = await prisma.storeConfig.count();
     if (storeConfigCount === 0) {
-        await prisma.storeConfig.create({
-            data: storeConfig,
-        });
+        await prisma.storeConfig.create({ data: storeConfig });
     }
 
-    const sectionIds = seedSections.map((section) => section.id);
-    const existingSections = await prisma.section.findMany({
-        where: { id: { in: sectionIds } },
-        select: { id: true },
-    });
-    const existingSectionIds = new Set(existingSections.map((item) => item.id));
-    const sectionsToCreate = seedSections
-        .filter((section) => !existingSectionIds.has(section.id))
-        .map((section) => ({
-            id: section.id,
-            name: section.name,
-            isActive: section.isActive,
-            order: section.order,
-            isBanner: section.isBanner,
-            bannerImg: section.bannerImg,
-        }));
+    await prisma.section.createMany({ data: seedSections, skipDuplicates: true });
 
-    if (sectionsToCreate.length > 0) {
-        await prisma.section.createMany({
-            data: sectionsToCreate,
-            skipDuplicates: true,
-        });
-    }
-
-    const seedProducts = seedSections.flatMap((section) => section.products);
-    const productIds = seedProducts.map((product) => product.id);
-    const existingProducts = await prisma.product.findMany({
-        where: { id: { in: productIds } },
-        select: { id: true },
+    await prisma.category.createMany({
+        data: seedCategories.map((category) => ({
+            id: category.id,
+            name: category.name,
+            pricePerGram: category.pricePerGram,
+            isActive: category.isActive,
+        })),
+        skipDuplicates: true,
     });
-    const existingProductIds = new Set(existingProducts.map((item) => item.id));
-    const productsToCreate = seedProducts
-        .filter((product) => !existingProductIds.has(product.id))
-        .map((product) => ({
+
+    await prisma.product.createMany({
+        data: seedProducts.map((product) => ({
             id: product.id,
             name: product.name,
             description: product.description,
-            price: product.price,
-            discountPercentage: product.discountPercentage,
+            price: 0,
             stock: product.stock,
+            discountPercentage: product.discountPercentage,
             image: product.image,
             isActive: product.isActive,
-        }));
-
-    if (productsToCreate.length > 0) {
-        await prisma.product.createMany({
-            data: productsToCreate,
-            skipDuplicates: true,
-        });
-    }
-
-    const categoryIds = seedCategories.map((category) => category.id);
-    const existingCategories = await prisma.category.findMany({
-        where: { id: { in: categoryIds } },
-        select: { id: true },
+        })),
+        skipDuplicates: true,
     });
-    const existingCategoryIds = new Set(
-        existingCategories.map((item) => item.id),
-    );
-    const categoriesToCreate = seedCategories
-        .filter((category) => !existingCategoryIds.has(category.id))
-        .map((category) => ({
-            id: category.id,
-            name: category.name,
-            isActive: category.isActive,
-        }));
-
-    if (categoriesToCreate.length > 0) {
-        await prisma.category.createMany({
-            data: categoriesToCreate,
-            skipDuplicates: true,
-        });
-    }
 
     const sectionCategoryLinks = seedCategories.flatMap((category) =>
-        category.sectionIds.map((sectionId) => ({
-            sectionId,
-            categoryId: category.id,
-        })),
+        category.sectionIds.map((sectionId) => ({ sectionId, categoryId: category.id })),
     );
-    if (sectionCategoryLinks.length > 0) {
-        await prisma.sectionCategory.createMany({
-            data: sectionCategoryLinks,
-            skipDuplicates: true,
-        });
-    }
+    await prisma.sectionCategory.createMany({ data: sectionCategoryLinks, skipDuplicates: true });
 
-    const categoryIdsBySection = new Map();
-    seedCategories.forEach((category) => {
-        category.sectionIds.forEach((sectionId) => {
-            const current = categoryIdsBySection.get(sectionId) ?? [];
-            categoryIdsBySection.set(sectionId, [...current, category.id]);
-        });
-    });
-
-    const productCategoryLinks = seedSections.flatMap((section) =>
-        section.products.flatMap((product) => {
-            const relatedCategoryIds = categoryIdsBySection.get(section.id) ?? [];
-            return relatedCategoryIds.map((categoryId) => ({
-                productId: product.id,
-                categoryId,
-            }));
-        }),
-    );
-
-    if (productCategoryLinks.length > 0) {
-        await prisma.productCategory.createMany({
-            data: productCategoryLinks,
-            skipDuplicates: true,
-        });
-    }
+    const productCategoryLinks = seedProducts.map((product) => ({
+        productId: product.id,
+        categoryId: product.categoryId,
+    }));
+    await prisma.productCategory.createMany({ data: productCategoryLinks, skipDuplicates: true });
 };
 
 seed()
