@@ -1,5 +1,25 @@
 "use client";
 
+const formatBrazilPhone = (value: string): string => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+
+    if (digits.length <= 2) {
+        return digits ? `(${digits}` : "";
+    }
+
+    const ddd = digits.slice(0, 2);
+
+    if (digits.length <= 6) {
+        return `(${ddd}) ${digits.slice(2)}`;
+    }
+
+    if (digits.length <= 10) {
+        return `(${ddd}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    }
+
+    return `(${ddd}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+};
+
 type StoreConfigFormData = {
     whatsappNumber: string;
     email: string;
@@ -43,11 +63,17 @@ export function StoreConfigForm({
                 <div className="space-y-1">
                     <label className="text-sm font-medium">WhatsApp</label>
                     <input
-                        value={form.whatsappNumber}
+                        value={formatBrazilPhone(form.whatsappNumber)}
                         onChange={(event) =>
-                            onChangeField("whatsappNumber", event.target.value)
+                            onChangeField(
+                                "whatsappNumber",
+                                formatBrazilPhone(event.target.value),
+                            )
                         }
                         className="w-full rounded-xl border border-[#334D40]/20 bg-white px-3 py-2"
+                        placeholder="(00) 00000-0000"
+                        inputMode="tel"
+                        pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
                         required
                     />
                 </div>

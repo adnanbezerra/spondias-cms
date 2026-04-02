@@ -1,7 +1,12 @@
 import { z } from "zod";
 
 export const storeConfigUpdateInputSchema = z.object({
-    whatsappNumber: z.string().min(10),
+    whatsappNumber: z
+        .string()
+        .refine((value) => {
+            const digits = value.replace(/\D/g, "");
+            return digits.length === 10 || digits.length === 11;
+        }, "WhatsApp deve conter DDD e número válidos."),
     email: z.email(),
     address: z.string().min(5),
     companyName: z.string().min(2),
