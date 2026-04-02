@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 type AuthResponse = {
     token: string;
@@ -14,7 +13,6 @@ type AuthResponse = {
 };
 
 export const LoginForm = () => {
-    const router = useRouter();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -44,8 +42,8 @@ export const LoginForm = () => {
                 return;
             }
 
-            router.push("/admin");
-            router.refresh();
+            window.location.assign("/admin");
+            return;
         } catch {
             setErrorMessage("Falha de conexão ao autenticar.");
         } finally {
