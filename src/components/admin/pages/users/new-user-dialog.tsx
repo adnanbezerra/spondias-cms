@@ -86,6 +86,7 @@ export const NewUserDialog = ({
                         })
                     }
                     className="w-full rounded-xl border border-[#334D40]/20 px-3 py-2"
+                    placeholder="000.000.000-00"
                     required
                     minLength={11}
                     maxLength={14}
