@@ -40,35 +40,40 @@ type CartProviderProps = {
     whatsappNumber: string;
 };
 
-const getInitialItems = (): CartItem[] => {
-    if (typeof window === "undefined") {
-        return [];
-    }
-
-    const raw = window.localStorage.getItem(CART_STORAGE_KEY);
-    if (!raw) {
-        return [];
-    }
-
-    try {
-        return JSON.parse(raw) as CartItem[];
-    } catch {
-        return [];
-    }
-};
-
 export function CartProvider({ children, whatsappNumber }: CartProviderProps) {
-    const [items, setItems] = useState<CartItem[]>(getInitialItems);
+    const [items, setItems] = useState<CartItem[]>([]);
+    const [hasHydrated, setHasHydrated] = useState(false);
     const { showToast } = usePublicToast();
 
     useEffect(() => {
+        const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+
+        if (!raw) {
+            setHasHydrated(true);
+            return;
+        }
+
+        try {
+            setItems(JSON.parse(raw) as CartItem[]);
+        } catch {
+            window.localStorage.removeItem(CART_STORAGE_KEY);
+        } finally {
+            setHasHydrated(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!hasHydrated) {
+            return;
+        }
+
         if (items.length === 0) {
             window.localStorage.removeItem(CART_STORAGE_KEY);
             return;
         }
 
         window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-    }, [items]);
+    }, [hasHydrated, items]);
 
     const addToCart = useCallback((product: PublicProduct) => {
         setItems((current) => {
